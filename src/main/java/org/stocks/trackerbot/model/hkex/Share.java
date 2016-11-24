@@ -2,15 +2,15 @@ package org.stocks.trackerbot.model.hkex;
 
 public class Share {
 
-	private String symbol;
+	private String id;
 	private String name;
 
-	public String getSymbol() {
-		return symbol;
+	public String getId() {
+		return id;
 	}
 
-	public void setSymbol(String symbol) {
-		this.symbol = symbol;
+	public void setId(String id) {
+		this.id = id;
 	}
 
 	public String getName() {

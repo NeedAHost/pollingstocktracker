@@ -2,6 +2,7 @@ package org.stocks.trackerbot.util;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -25,14 +26,24 @@ public class DateUtil {
 	public static List<String> getDateStrInRange(String start, String end) {
 		LocalDate startD = LocalDate.parse(start);
 		LocalDate endD = LocalDate.parse(end);
+		return getDateStrInRange(startD, endD);
+	}
+	
+	public static List<String> getDateStrInRange(LocalDate start, LocalDate end) {
 		List<String> dates = new ArrayList<String>();
 
-		while (!startD.isAfter(endD)) {
-			dates.add(startD.format(formatter));
-			startD = startD.plusDays(1);
+		while (!start.isAfter(end)) {
+			dates.add(start.format(formatter));
+			start = start.plusDays(1);
 		}
 
 		return dates;
+	}
+	
+	public static List<String> getDateStrFromLastYear() {
+		LocalDate now = LocalDate.now();
+		LocalDate lastYear = now.plus(-1, ChronoUnit.YEARS);
+		return getDateStrInRange(now, lastYear);
 	}
 
 }

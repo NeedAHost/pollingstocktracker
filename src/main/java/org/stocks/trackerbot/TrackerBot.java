@@ -1,5 +1,6 @@
 package org.stocks.trackerbot;
 
+import java.time.LocalDate;
 import java.util.Calendar;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -36,7 +37,7 @@ public class TrackerBot {
 	private int retryCount = 0;
 	private int remainingSkipCount = 0;
 	private String lastDataId = "";
-	private Calendar lastTimestamp = Calendar.getInstance();
+	private LocalDate lastTimestamp = LocalDate.now();
 	private Recommender recommender = new Recommender();
 
 	public TrackerBot() {
@@ -47,11 +48,6 @@ public class TrackerBot {
 		} catch (TelegramApiRequestException e) {
 			logger.error("initialize telegram fail", e);
 		}
-	}
-
-	public boolean isNewDay() {
-		Calendar now = Calendar.getInstance();
-		return now.get(Calendar.DAY_OF_MONTH) != lastTimestamp.get(Calendar.DAY_OF_MONTH);
 	}
 
 	public boolean isOldData(TrackerData data) {
@@ -69,9 +65,7 @@ public class TrackerBot {
 		stop();
 		executorService.scheduleAtFixedRate(() -> {
 			try {
-				if (isNewDay()) {
-					getRecommender().clear();
-				}
+				clearEveryDay();
 				if (getRemainingSkipCount() > 0) {
 					setRemainingSkipCount(getRemainingSkipCount() - 1);
 					return;
@@ -83,8 +77,7 @@ public class TrackerBot {
 					logger.info("Old data " + pulled.getId());
 					retryCount++;
 					if (maxRetryCount <= retryCount) {
-						// sleep and reset
-						getRecommender().clear();
+						// sleep
 						int curHour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY);
 						if (curHour >= 0 && curHour <= 9) {
 							// active hour
@@ -105,6 +98,14 @@ public class TrackerBot {
 				logger.error("unknown error", e);
 			}
 		}, 0, pollPeriod, TimeUnit.MINUTES);
+	}
+
+	private void clearEveryDay() {
+		LocalDate now = LocalDate.now();
+		if (!now.equals(lastTimestamp)) {
+			getRecommender().clear();
+		}
+		lastTimestamp = now;
 	}
 
 	public TrackerData pullSource() {
