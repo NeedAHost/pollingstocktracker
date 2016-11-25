@@ -15,6 +15,7 @@ public class AbstractDao {
 	private static final Logger logger = LoggerFactory.getLogger(AbstractDao.class);
 
 	private String connectionStr = "jdbc:sqlite:C:/Users/Main/Documents/trackerbot/ccass.db"; // local
+//	private String connectionStr = "jdbc:sqlite:/Users/cy/Documents/workspace/ccass.db"; // local2
 
 	public boolean isTableExist(String tableName) {
 		Connection con = null;

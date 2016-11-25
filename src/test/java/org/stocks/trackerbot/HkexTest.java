@@ -64,7 +64,7 @@ public class HkexTest {
 		ShareholdingDao dao = new ShareholdingDao();
 		String symbol = "0575";
 
-		List<String> dates = DateUtil.getDateStrInRange("2015-11-24", "2016-11-23");
+		List<String> dates = DateUtil.getDateStrInRange("2016-11-22", "2016-11-23");
 		for (String date : dates) {
 			List<Shareholding> shList = hkex.get(symbol, date);
 			for (Shareholding sh : shList) {
@@ -74,7 +74,7 @@ public class HkexTest {
 		}
 	}
 	
-//	@Ignore
+	@Ignore
 	@Test
 	public void realTest2() {
 		HkexTracker hkex = new HkexTracker();

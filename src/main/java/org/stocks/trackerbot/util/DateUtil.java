@@ -43,7 +43,7 @@ public class DateUtil {
 	public static List<String> getDateStrFromLastYear() {
 		LocalDate now = LocalDate.now();
 		LocalDate lastYear = now.plus(-1, ChronoUnit.YEARS);
-		return getDateStrInRange(now, lastYear);
+		return getDateStrInRange(lastYear, now);
 	}
 
 }

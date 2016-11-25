@@ -24,11 +24,11 @@ public class HkexWeb {
 	private String postTemplate = "txt_today_d=%1$s&txt_today_m=%2$s&txt_today_y=%3$s&current_page=1&stock_market=HKEX&IsExist_Slt_Stock_Id=False&IsExist_Slt_Part_Id=False&rdo_SelectSortBy=Shareholding&sessionToken=%4$s&sel_ShareholdingDate_d=%5$s&sel_ShareholdingDate_m=%6$s&sel_ShareholdingDate_y=%7$s&txt_stock_code=%8$05d&txt_stock_name=&txt_ParticipantID=&txt_Participant_name=";
 
 	private final Pattern participantPattern = Pattern.compile(
-			"<td valign=\"top\" nowrap=\"nowrap\" class=\"arial12black\" bgcolor=\"#\\w\"><img src=\"../../image/spacer.gif\" width=\"10\" height=\"10\"/>([\\w]+)</td>");
+			"<td valign=\"top\" nowrap=\"nowrap\" class=\"arial12black\" bgcolor=\"#[\\w]+\"><img src=\"../../image/spacer.gif\" width=\"10\" height=\"10\"/>([\\w]+)</td>");
 	private final Pattern percentagePattern = Pattern.compile(
-			"<td valign=\"top\" nowrap=\"nowrap\" class=\"arial12black\" align=\"Right\" bgcolor=\"#\\w\">([0-9.%]+)<img src=\"../../image/spacer.gif\" width=\"10\" height=\"10\"/>");
+			"<td valign=\"top\" nowrap=\"nowrap\" class=\"arial12black\" align=\"Right\" bgcolor=\"#[\\w]+\">([0-9.%]+)<img src=\"../../image/spacer.gif\" width=\"10\" height=\"10\"/>");
 	private final Pattern holdingPattern = Pattern.compile(
-			"<td valign=\"top\" nowrap=\"nowrap\" class=\"arial12black\" align=\"Right\" bgcolor=\"#\\w\">([0-9,]+)<img src=\"../../image/spacer.gif\" width=\"10\" height=\"10\"/>");
+			"<td valign=\"top\" nowrap=\"nowrap\" class=\"arial12black\" align=\"Right\" bgcolor=\"#[\\w]+\">([0-9,]+)<img src=\"../../image/spacer.gif\" width=\"10\" height=\"10\"/>");
 	private final Pattern totalHoldingPattern = Pattern.compile(
 			"<td nowrap=\"nowrap\" class=\"arial12black\"  align=\"Right\"><span class=\"mobilezoom\">15,144,602,396</span>");
 
@@ -67,7 +67,7 @@ public class HkexWeb {
 
 			resp = HttpUtil.post(baseUrl, postData, cookieAndData[0]);
 
-			System.out.println(resp);
+//			System.out.println(resp);
 
 			List<String> allPId = new ArrayList<String>();
 			Matcher mpa = participantPattern.matcher(resp);
