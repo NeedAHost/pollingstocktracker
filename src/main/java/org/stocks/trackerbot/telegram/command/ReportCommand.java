@@ -35,8 +35,10 @@ public class ReportCommand extends BotCommand {
 	public void execute(AbsSender absSender, User user, Chat chat, String[] arguments) {
 		try {
 			SendMessage ans = new SendMessage();
+			ans.enableMarkdown(true);
 			ans.setChatId(chat.getId().toString());
 			ans.setText(this.trackerBot.getRecommender().summarize());
+			ans.disableWebPagePreview();
 			absSender.sendMessage(ans);
 		} catch (TelegramApiException e) {
 			logger.error("command execute fail", e);
