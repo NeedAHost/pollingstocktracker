@@ -80,5 +80,12 @@ public class HkexTest {
 		HkexTracker hkex = new HkexTracker();
 		hkex.loadHistorial();
 	}
+	
+	@Ignore
+	@Test
+	public void realTest3() {
+		HkexTracker hkex = new HkexTracker();
+		hkex.loadToday();
+	}
 
 }

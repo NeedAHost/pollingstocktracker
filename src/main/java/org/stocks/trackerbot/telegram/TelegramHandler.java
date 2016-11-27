@@ -2,8 +2,10 @@ package org.stocks.trackerbot.telegram;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.stocks.trackerbot.Config;
 import org.stocks.trackerbot.TrackerBot;
 import org.stocks.trackerbot.telegram.command.ListHistoryCommand;
+import org.stocks.trackerbot.telegram.command.ReportCommand;
 import org.stocks.trackerbot.telegram.command.ResetCommand;
 import org.stocks.trackerbot.telegram.command.ScanCommand;
 import org.stocks.trackerbot.telegram.command.StopCommand;
@@ -18,8 +20,6 @@ public class TelegramHandler extends TelegramLongPollingCommandBot {
 	private static final Logger logger = LoggerFactory.getLogger(TelegramHandler.class);
 	private final String name = "PollingTrackerBot";
 	private final String token = "219272152:AAEE9xHk0_eB53KUgjNzmMy8hBium_C4Az4";
-	private Long chatId = -1001061651082L; // group
-//	private Long chatId = 245513956L; // private
 	private TrackerBot trackerBot;
 		
 	public TelegramHandler(TrackerBot trackerBot) {
@@ -28,6 +28,7 @@ public class TelegramHandler extends TelegramLongPollingCommandBot {
 		register(new ResetCommand(trackerBot));
 		register(new StopCommand(trackerBot));
 		register(new ListHistoryCommand(trackerBot));
+		register(new ReportCommand(trackerBot));
 	}
 
 	@Override
@@ -49,7 +50,7 @@ public class TelegramHandler extends TelegramLongPollingCommandBot {
 		SendMessage req = new SendMessage();
 		req.enableMarkdown(true);
 		req.setText(msg);
-		req.setChatId(chatId.toString());
+		req.setChatId(Config.chatId.toString());
 		req.disableWebPagePreview();
 		try {
 			logger.info("sending telegram msg..");

@@ -11,8 +11,8 @@ public class PriceTagger implements ITagger {
 
 	private BigDecimal upperLimit = new BigDecimal("15");
 	private BigDecimal lowerLimit = new BigDecimal("0.1");
-	public static String HIGH = "high price";
-	public static String LOW = "low price";
+	public static final String HIGH = "high price";
+	public static final String LOW = "low price";
 	
 	public PriceTagger() {
 		

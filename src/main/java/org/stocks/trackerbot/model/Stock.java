@@ -15,6 +15,7 @@ public class Stock {
 	private Category category;
 	private String symbol;
 	private String name;
+	private String firstSeenPrice;
 	private String price;
 	private String priceChange;
 	private String volume;
@@ -23,13 +24,14 @@ public class Stock {
 	private String endTime;
 	private String open;
 	private String prevClose;
+	private String firstSeenTime;
 
 	private Set<String> tags = new HashSet<String>();
-	
+
 	public Stock() {
-		
+		firstSeenTime = sdf.format(new Date());
 	}
-	
+
 	public Stock(String symbol) {
 		this.symbol = symbol;
 	}
@@ -41,7 +43,7 @@ public class Stock {
 		}
 		return false;
 	}
-	
+
 	@Override
 	public int hashCode() {
 		if (symbol != null) {
@@ -60,7 +62,7 @@ public class Stock {
 	public void setSymbol(String symbol) {
 		this.symbol = symbol;
 	}
-	
+
 	public String getSymbolPadded() {
 		return String.format("%04d", Integer.parseInt(symbol));
 	}
@@ -79,6 +81,9 @@ public class Stock {
 
 	public void setPrice(String price) {
 		this.price = price;
+		if (firstSeenPrice == null) {
+			this.firstSeenPrice = price;
+		}
 	}
 
 	public String getPriceChange() {
@@ -126,12 +131,20 @@ public class Stock {
 		return df.format(percent) + "%";
 	}
 
-	private static final String format = "[%1$4s:%2$4s](%3$s) %4$4s(%5$s) Vol:%6$s(%7$s) %8$s";
+	private static final String printFormat = "[%1$4s:%2$4s](%3$s) %4$4s(%5$s) Vol:%6$s(%7$s) %8$s";
 
 	public String print() {
 		String shortName = name.length() <= 4 ? name : name.substring(0, 4);
-		return String.format(format, symbol, shortName, getUrl(), price, priceChange, volume, this.getVolumeChange(),
-				this.getStartTime());
+		return String.format(printFormat, symbol, shortName, getUrl(), price, priceChange, volume,
+				this.getVolumeChange(), this.getStartTime());
+	}
+
+	private static final String summarizeFormat = "[%1$4s:%2$4s](%3$s) %4$s >> %5$s (%6$s) %7$s";
+
+	public String printSummary() {
+		String shortName = name.length() <= 4 ? name : name.substring(0, 4);
+		return String.format(summarizeFormat, symbol, shortName, getUrl(), firstSeenPrice, price, this.getEarnPercent(),
+				firstSeenTime);
 	}
 
 	private String getUrl() {
@@ -190,5 +203,28 @@ public class Stock {
 
 	public void setCategory(Category category) {
 		this.category = category;
+	}
+
+	public String getFirstSeenPrice() {
+		return firstSeenPrice;
+	}
+
+	public void setFirstSeenPrice(String firstSeenPrice) {
+		this.firstSeenPrice = firstSeenPrice;
+	}
+
+	public String getEarnPercent() {
+		BigDecimal firstBd = new BigDecimal(firstSeenPrice);
+		BigDecimal earning = new BigDecimal(price).subtract(firstBd).divide(firstBd).multiply(new BigDecimal("100"));
+		earning = earning.setScale(2, BigDecimal.ROUND_HALF_UP);
+		return earning.toString() + "%";
+	}
+
+	public String getFirstSeenTime() {
+		return firstSeenTime;
+	}
+
+	public void setFirstSeenTime(String firstSeenTime) {
+		this.firstSeenTime = firstSeenTime;
 	}
 }

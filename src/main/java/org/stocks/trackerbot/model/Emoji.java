@@ -16,6 +16,12 @@ public class Emoji {
 	public static final int snake = 0x1F40D; // low
 	public static final int bug = 0x1F41B; // suspect
 	public static final int gem = 0x1F48E; // gem
+	public static final int fallingLeaf = 0x1F343; // low vol
+	public static final int moneyBag = 0x1F4B0; // high price
+	public static final int angel = 0x1F47C; // low price
+	public static final int question = 0x2753; // unknown
 	
+	public static final int exclamation = 0x203C; // marked
 	public static final int mountain = 0x1F5FB; // high open 
+	public static final int barchart = 0x1F4CA; // report
 }

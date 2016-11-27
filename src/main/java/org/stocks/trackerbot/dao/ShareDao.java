@@ -53,20 +53,12 @@ public class ShareDao extends AbstractDao {
 		q = q.substring(0, q.length() - 1);
 		return this.executeUpdate(q) > 0;
 	}
-	
+
 	public List<Share> getAll() {
 		List<Share> ret = new ArrayList<Share>();
-		Connection con = null;
-		Statement st = null;
-		ResultSet rs = null;
-		try {
-			String q = "SELECT * FROM share";
-			con = DriverManager.getConnection(getConnectionStr());
-			if (con == null) {
-				return ret;
-			}
-			st = con.createStatement();
-			rs = st.executeQuery(q);
+		String q = "SELECT * FROM share";
+		try (Connection con = DriverManager.getConnection(getConnectionStr()); Statement st = con.createStatement()) {
+			ResultSet rs = st.executeQuery(q);
 			while (rs.next()) {
 				Share s = new Share();
 				s.setId(rs.getString("id"));
@@ -77,20 +69,6 @@ public class ShareDao extends AbstractDao {
 		} catch (Exception e) {
 			logger.error("share get all error", e);
 			return ret;
-		} finally {
-			try {
-				if (rs != null) {
-					rs.close();
-				}
-				if (st != null) {
-					st.close();
-				}
-				if (con != null) {
-					con.close();
-				}
-			} catch (SQLException e) {
-				logger.error("db close fail", e);
-			}
 		}
 	}
 

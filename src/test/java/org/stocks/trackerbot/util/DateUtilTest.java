@@ -22,6 +22,31 @@ public class DateUtilTest {
 	}
 	
 	@Test
+	public void getLastYearMonthRangeTest() {
+		List<String> months = DateUtil.getMonthStrFromLastYear();
+		assertEquals(12, months.size());
+	}
+	
+	@Test
+	public void getMonthRangeTest() {
+		List<String> months = DateUtil.getMonthStrInRange("2015-11-27", "2016-11-26");
+		assertEquals(13, months.size());
+		assertEquals("2016-11-01", months.get(0));
+		assertEquals("2016-10-01", months.get(1));
+		assertEquals("2016-09-01", months.get(2));
+		assertEquals("2016-08-01", months.get(3));
+		assertEquals("2016-07-01", months.get(4));
+		assertEquals("2016-06-01", months.get(5));
+		assertEquals("2016-05-01", months.get(6));
+		assertEquals("2016-04-01", months.get(7));
+		assertEquals("2016-03-01", months.get(8));
+		assertEquals("2016-02-01", months.get(9));
+		assertEquals("2016-01-01", months.get(10));
+		assertEquals("2015-12-01", months.get(11));
+		assertEquals("2015-11-01", months.get(12));
+	}
+	
+	@Test
 	public void dateDiffTest() {
 		LocalDate d1 = LocalDate.of(2016, 11, 22);		
 		LocalDate d2 = LocalDate.of(2016, 11, 23);

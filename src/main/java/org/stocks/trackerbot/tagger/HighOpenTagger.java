@@ -13,7 +13,11 @@ public class HighOpenTagger implements ITagger {
 	private BigDecimal upperLimit = new BigDecimal("103");
 	private BigDecimal hundred = new BigDecimal("100");
 	public static String HIGH = "high open";
-	private YFinanceAPI yFin = new YFinanceAPI();
+	private YFinanceAPI yFin;
+	
+	public HighOpenTagger(YFinanceAPI yFin) {
+		this.yFin = yFin;
+	}
 
 	@Override
 	public void tag(TrackerData data) {

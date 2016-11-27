@@ -32,13 +32,12 @@ public class TrackerBot {
 	private ScheduledExecutorService executorService;
 	private TelegramHandler telegramHandler;
 
-	private int pollPeriod = 7;
-	private int maxRetryCount = 3;
 	private int retryCount = 0;
 	private int remainingSkipCount = 0;
 	private String lastDataId = "";
 	private LocalDate lastTimestamp = LocalDate.now();
 	private Recommender recommender = new Recommender();
+	private boolean reportSent = false;
 
 	public TrackerBot() {
 		TelegramBotsApi telegramBotsApi = new TelegramBotsApi();
@@ -51,7 +50,7 @@ public class TrackerBot {
 	}
 
 	public boolean isOldData(TrackerData data) {
-		return getLastDataId().equals(data.getId());
+		return Config.skipOldData && getLastDataId().equals(data.getId());
 	}
 
 	public void stop() {
@@ -76,13 +75,16 @@ public class TrackerBot {
 				if (isOldData(pulled)) {
 					logger.info("Old data " + pulled.getId());
 					retryCount++;
-					if (maxRetryCount <= retryCount) {
+					if (Config.maxRetryCount <= retryCount) {
 						// sleep
 						int curHour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY);
 						if (curHour >= 0 && curHour <= 9) {
 							// active hour
 							setRemainingSkipCount(3);
-						} else {
+						} else if (curHour > 9) {
+							if (!reportSent) {
+								sentReport();
+							}
 							setRemainingSkipCount(12);
 						}
 						retryCount = 0;
@@ -97,13 +99,19 @@ public class TrackerBot {
 			} catch (Exception e) {
 				logger.error("unknown error", e);
 			}
-		}, 0, pollPeriod, TimeUnit.MINUTES);
+		}, 0, Config.pollPeriod, TimeUnit.MINUTES);
+	}
+
+	private void sentReport() {
+		telegramHandler.sendMessage(getRecommender().summarize());
+		reportSent = true;
 	}
 
 	private void clearEveryDay() {
 		LocalDate now = LocalDate.now();
 		if (!now.equals(lastTimestamp)) {
 			getRecommender().clear();
+			reportSent = false;
 		}
 		lastTimestamp = now;
 	}

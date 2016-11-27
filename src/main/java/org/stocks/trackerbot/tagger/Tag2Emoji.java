@@ -22,10 +22,18 @@ public class Tag2Emoji {
 		map.put(Category.UP.name(), Emoji.volcano);
 		map.put(Category.PENDING.name(), Emoji.fire);
 		map.put(Category.NEW_HIGH.name(), Emoji.rocket);
+		map.put(MarkedTagger.MARKED, Emoji.exclamation);
+		map.put(VolumeTagger.LOW, Emoji.fallingLeaf);
+		map.put(PriceTagger.HIGH, Emoji.moneyBag);
+		map.put(PriceTagger.LOW, Emoji.angel);
 	}
 	
 	public static int mapTag(String tag) {
-		return map.get(tag);
+		Integer i = map.get(tag);
+		if (i == null) {
+			i = Emoji.question;
+		}
+		return i;
 	}
 	
 }
