@@ -1,5 +1,7 @@
 package org.stocks.trackerbot.telegram.command;
 
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.stocks.trackerbot.TrackerBot;
@@ -34,12 +36,15 @@ public class ReportCommand extends BotCommand {
 	@Override
 	public void execute(AbsSender absSender, User user, Chat chat, String[] arguments) {
 		try {
-			SendMessage ans = new SendMessage();
-			ans.enableMarkdown(true);
-			ans.setChatId(chat.getId().toString());
-			ans.setText(this.trackerBot.getRecommender().summarize());
-			ans.disableWebPagePreview();
-			absSender.sendMessage(ans);
+			List<String> summarized = this.trackerBot.getRecommender().summarize();
+			for (String s : summarized) {
+				SendMessage ans = new SendMessage();
+				ans.enableMarkdown(true);
+				ans.setChatId(chat.getId().toString());
+				ans.setText(s);
+				ans.disableWebPagePreview();
+				absSender.sendMessage(ans);
+			}		
 		} catch (TelegramApiException e) {
 			logger.error("command execute fail", e);
 		}

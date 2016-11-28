@@ -103,7 +103,9 @@ public class TrackerBot {
 	}
 
 	private void sentReport() {
-		telegramHandler.sendMessage(getRecommender().summarize());
+		for (String s : getRecommender().summarize()) {
+			telegramHandler.sendMessage(s);
+		}		
 		reportSent = true;
 	}
 

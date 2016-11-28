@@ -9,7 +9,7 @@ import org.stocks.trackerbot.util.NumberNormalizer;
 
 public class VolumeTagger implements ITagger {
 
-	private BigDecimal lowerLimit = new BigDecimal("5000000");
+	private BigDecimal lowerLimit = new BigDecimal("8000000");
 	public static final String LOW = "low avg volume";
 
 	public VolumeTagger() {

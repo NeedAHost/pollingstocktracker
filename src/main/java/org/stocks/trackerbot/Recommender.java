@@ -62,12 +62,23 @@ public class Recommender {
 		for (ITagger t : this.expensiveTaggers) {
 			t.tag(recommending);
 		}
-
-		String msg = getLatestRecommendMessage(recommending);
+		
+		// reorder
+		Set<Stock> ordered = new LinkedHashSet<Stock>();
+		for (Stock stock : recommending) {
+			if (stock.getTags().contains(MarkedTagger.MARKED)) {
+				ordered.add(stock);
+			}
+		}
+		recommending.removeAll(ordered);
+		// marked at first
+		ordered.addAll(recommending);
+		
+		String msg = getLatestRecommendMessage(ordered);
 		return msg;
 	}
 
-	public String summarize() {
+	public List<String> summarize() {
 		StringBuilder msg = new StringBuilder();
 		msg.appendCodePoint(Emoji.barchart);
 		msg.append("Today summary:\n");
@@ -84,7 +95,27 @@ public class Recommender {
 			}
 			msg = msg.append(" " + f.printSummary() + "\n");
 		}
-		return msg.toString();
+		String[] perLine = msg.toString().split("\\n");
+		return divideMessage(perLine);
+	}
+	
+	private int linePerMessage = 10;
+
+	private List<String> divideMessage(String[] perLine) {
+		String temp = "";
+		List<String> ret = new ArrayList<String>();		
+		for (int j = 0; j < perLine.length; j++) {
+			String s = perLine[j];
+			temp += s + "\n";
+			if (j % linePerMessage == 0) {
+				ret.add(temp);
+				temp = "";
+			}
+		}
+		if (temp.length() > 0) {
+			ret.add(temp);
+		}
+		return ret;
 	}
 
 	private String getLatestRecommendMessage(Collection<Stock> latest) {
