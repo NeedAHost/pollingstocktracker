@@ -10,6 +10,7 @@ import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.stocks.trackerbot.google.GoogFinanceAPI;
 import org.stocks.trackerbot.model.Emoji;
 import org.stocks.trackerbot.model.Stock;
 import org.stocks.trackerbot.model.TrackerData;
@@ -29,6 +30,7 @@ public class Recommender {
 	private List<ITagger> cheapTaggers = new ArrayList<ITagger>();
 	private List<ITagger> expensiveTaggers = new ArrayList<ITagger>();
 	private YFinanceAPI yFin = new YFinanceAPI();
+	private GoogFinanceAPI goog = new GoogFinanceAPI(); 
 
 	public Recommender() {
 		cheapTaggers.add(new MarkedTagger());
@@ -46,23 +48,27 @@ public class Recommender {
 		HashSet<Stock> recommending = new HashSet<Stock>(filter(data));
 		for (Iterator<Stock> iterator = recommending.iterator(); iterator.hasNext();) {
 			Stock ing = iterator.next();
+			if (ing.getTags().contains(MarkedTagger.MARKED)) {
+				// marked always display
+				continue;
+			}
 			for (Stock ed : recommended) {
-				if (ing.getTags().contains(MarkedTagger.MARKED)) {
-					// marked always display
-					continue;
-				}
 				if (ing.getSymbol().endsWith(ed.getSymbol()) || ed.getSymbol().endsWith(ing.getSymbol())) {
 					iterator.remove();
 					break;
 				}
 			}
 		}
-		getRecommended().addAll(recommending);
+		for (Stock r : recommending) {
+			if (!getRecommended().contains(r)) {
+				getRecommended().add(r);
+			}
+		}
 
 		for (ITagger t : this.expensiveTaggers) {
 			t.tag(recommending);
 		}
-		
+
 		// reorder
 		Set<Stock> ordered = new LinkedHashSet<Stock>();
 		for (Stock stock : recommending) {
@@ -73,7 +79,7 @@ public class Recommender {
 		recommending.removeAll(ordered);
 		// marked at first
 		ordered.addAll(recommending);
-		
+
 		String msg = getLatestRecommendMessage(ordered);
 		return msg;
 	}
@@ -85,8 +91,9 @@ public class Recommender {
 		msg.append("----------------\n");
 		for (Stock f : this.getRecommended()) {
 			// update latest price
-			yFin.update(f);
-//			msg = msg.appendCodePoint(Tag2Emoji.mapTag(f.getCategory().name()));
+			goog.update(f);
+			// msg =
+			// msg.appendCodePoint(Tag2Emoji.mapTag(f.getCategory().name()));
 			for (String t : f.getTags()) {
 				Integer i = Tag2Emoji.mapTag(t);
 				if (i != null) {
@@ -98,14 +105,14 @@ public class Recommender {
 		String[] perLine = msg.toString().split("\\n");
 		return divideMessage(perLine);
 	}
-	
-	private int linePerMessage = 10;
+
+	private int linePerMessage = 15;
 
 	private List<String> divideMessage(String[] perLine) {
 		String temp = "";
-		List<String> ret = new ArrayList<String>();		
-		for (int j = 0; j < perLine.length; j++) {
-			String s = perLine[j];
+		List<String> ret = new ArrayList<String>();
+		for (int j = 1; j <= perLine.length; j++) {
+			String s = perLine[j - 1];
 			temp += s + "\n";
 			if (j % linePerMessage == 0) {
 				ret.add(temp);
@@ -121,7 +128,8 @@ public class Recommender {
 	private String getLatestRecommendMessage(Collection<Stock> latest) {
 		StringBuilder msg = new StringBuilder();
 		for (Stock f : latest) {
-//			msg = msg.appendCodePoint(Tag2Emoji.mapTag(f.getCategory().name()));
+			// msg =
+			// msg.appendCodePoint(Tag2Emoji.mapTag(f.getCategory().name()));
 			for (String t : f.getTags()) {
 				Integer i = Tag2Emoji.mapTag(t);
 				if (i != null) {
@@ -164,10 +172,6 @@ public class Recommender {
 
 	public Set<Stock> getRecommended() {
 		return recommended;
-	}
-
-	public void setRecommended(Set<Stock> recommended) {
-		this.recommended = recommended;
 	}
 
 }

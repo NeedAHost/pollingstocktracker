@@ -7,7 +7,7 @@ public class Config {
 	// aws
 	public static final String markedFilePath = "C:\\Users\\Administrator\\Documents\\workspace\\marked.txt";
 	
-	public static final int pollPeriod = 7;
+	public static final int pollPeriod = 10;
 	
 	public static final int maxRetryCount = 3;
 	

@@ -139,7 +139,7 @@ public class Stock {
 				this.getVolumeChange(), this.getStartTime());
 	}
 
-	private static final String summarizeFormat = "[%1$4s:%2$4s](%3$s) %4$s >> %5$s (%6$s) %7$s";
+	private static final String summarizeFormat = "[%1$4s](%3$s) %4$s > %5$s (%6$s)";
 
 	public String printSummary() {
 		String shortName = name.length() <= 4 ? name : name.substring(0, 4);
@@ -209,13 +209,9 @@ public class Stock {
 		return firstSeenPrice;
 	}
 
-	public void setFirstSeenPrice(String firstSeenPrice) {
-		this.firstSeenPrice = firstSeenPrice;
-	}
-
 	public String getEarnPercent() {
 		BigDecimal firstBd = new BigDecimal(firstSeenPrice);
-		BigDecimal earning = new BigDecimal(price).subtract(firstBd).divide(firstBd).multiply(new BigDecimal("100"));
+		BigDecimal earning = new BigDecimal(price).subtract(firstBd).multiply(new BigDecimal("100")).divide(firstBd, RoundingMode.HALF_UP);
 		earning = earning.setScale(2, BigDecimal.ROUND_HALF_UP);
 		return earning.toString() + "%";
 	}

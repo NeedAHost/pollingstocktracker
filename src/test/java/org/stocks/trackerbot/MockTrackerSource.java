@@ -13,20 +13,21 @@ public class MockTrackerSource extends TrackerSource {
 			InputStream in = getClass().getResourceAsStream("/capture_1.txt");
 			BufferedReader br = new BufferedReader(new InputStreamReader(in, "UTF-8"));
 			StringBuilder sb = new StringBuilder();
-			
+
 			String line = null;
 			while ((line = br.readLine()) != null) {
 				sb.append(line).append("\n");
 			}
-			
+
 			Random rnd = new Random();
 			int s = rnd.nextInt(9998) + 1;
-			return sb.toString().replace("323", Integer.toString(s)).replace("945", "30");
+			return sb.toString().replace("323", Integer.toString(s)).replace("945", "30").replace("125",
+					rnd.nextInt(10) + "");
 		} catch (Exception e) {
 			return "";
 		}
 	}
-	
+
 	@Override
 	public String getUrlStr() {
 		return "LOCAL";
