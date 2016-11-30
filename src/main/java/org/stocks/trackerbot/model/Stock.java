@@ -8,9 +8,13 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.stocks.trackerbot.util.NumberNormalizer;
 
 public class Stock {
+
+	private static final Logger logger = LoggerFactory.getLogger(Stock.class);
 
 	private Category category;
 	private String symbol;
@@ -122,13 +126,18 @@ public class Stock {
 		if (volume == null || avgVolume == null) {
 			return "";
 		}
-		BigDecimal percent = NumberNormalizer.normalize(volume).multiply(new BigDecimal("100"))
-				.divide(NumberNormalizer.normalize(avgVolume), RoundingMode.HALF_UP);
-		DecimalFormat df = new DecimalFormat();
-		df.setMaximumFractionDigits(0);
-		df.setMinimumFractionDigits(0);
-		df.setGroupingUsed(false);
-		return df.format(percent) + "%";
+		try {
+			BigDecimal percent = NumberNormalizer.normalize(volume).multiply(new BigDecimal("100"))
+					.divide(NumberNormalizer.normalize(avgVolume), RoundingMode.HALF_UP);
+			DecimalFormat df = new DecimalFormat();
+			df.setMaximumFractionDigits(0);
+			df.setMinimumFractionDigits(0);
+			df.setGroupingUsed(false);
+			return df.format(percent) + "%";
+		} catch (Exception e) {
+			logger.error("vol " + volume + ", avg vol " + avgVolume, e);
+			return "";
+		}
 	}
 
 	private static final String printFormat = "[%1$4s:%2$4s](%3$s) %4$4s(%5$s) Vol:%6$s(%7$s) %8$s";
@@ -211,7 +220,8 @@ public class Stock {
 
 	public String getEarnPercent() {
 		BigDecimal firstBd = new BigDecimal(firstSeenPrice);
-		BigDecimal earning = new BigDecimal(price).subtract(firstBd).multiply(new BigDecimal("100")).divide(firstBd, RoundingMode.HALF_UP);
+		BigDecimal earning = new BigDecimal(price).subtract(firstBd).multiply(new BigDecimal("100")).divide(firstBd,
+				RoundingMode.HALF_UP);
 		earning = earning.setScale(2, BigDecimal.ROUND_HALF_UP);
 		return earning.toString() + "%";
 	}

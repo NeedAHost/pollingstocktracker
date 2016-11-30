@@ -59,14 +59,16 @@ public class Recommender {
 				}
 			}
 		}
-		for (Stock r : recommending) {
-			if (!getRecommended().contains(r)) {
-				getRecommended().add(r);
-			}
-		}
 
 		for (ITagger t : this.expensiveTaggers) {
 			t.tag(recommending);
+		}
+		
+		for (Stock r : recommending) {
+			if (!getRecommended().contains(r)) {
+				goog.update(r);
+				getRecommended().add(r);
+			}
 		}
 
 		// reorder

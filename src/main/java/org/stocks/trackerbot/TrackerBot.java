@@ -81,7 +81,7 @@ public class TrackerBot {
 						if (curHour >= 0 && curHour <= 9) {
 							// active hour
 							setRemainingSkipCount(3);
-						} else if (curHour > 9) {
+						} else if (curHour >= 9) {
 							if (!reportSent) {
 								sentReport();
 							}
@@ -104,6 +104,7 @@ public class TrackerBot {
 
 	private void sentReport() {
 		for (String s : getRecommender().summarize()) {
+			logger.info(s);
 			telegramHandler.sendMessage(s);
 		}		
 		reportSent = true;

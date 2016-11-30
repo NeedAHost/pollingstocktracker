@@ -10,7 +10,7 @@ import org.stocks.trackerbot.yahoo.YFinanceAPI;
 
 public class HighOpenTagger implements ITagger {
 
-	private BigDecimal upperLimit = new BigDecimal("103");
+	private BigDecimal upperLimit = new BigDecimal("101");
 	private BigDecimal hundred = new BigDecimal("100");
 	public static String HIGH = "high open";
 	private YFinanceAPI yFin;

@@ -21,6 +21,9 @@ public class NumberNormalizer {
 		if (num.endsWith("M")) {
 			return new BigDecimal(num.substring(0, num.length() - 1)).multiply(new BigDecimal(1000000));
 		}
+		if (num.endsWith("B")) {
+			return new BigDecimal(num.substring(0, num.length() - 1)).multiply(new BigDecimal(1000000000));
+		}
 		return new BigDecimal(num);
 	}
 	

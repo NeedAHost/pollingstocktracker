@@ -29,6 +29,6 @@ public class GoogFinanceAPI {
 		}
 		JSONObject stockObj = arr.getJSONObject(0);
 		stock.setPrice(stockObj.getString("l"));
-		stock.setPriceChange(stockObj.getString("cp") + "%");
+//		stock.setPriceChange(stockObj.getString("cp") + "%");
 	}
 }
