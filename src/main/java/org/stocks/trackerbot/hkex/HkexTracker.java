@@ -32,7 +32,18 @@ public class HkexTracker {
 		logger.info("loading " + allShares.size() + " shares in today");
 		
 		String date = DateUtil.getTodayDateStr();
-		for (Share share : allShares) {
+		load(allShares, date);
+	}
+	
+	public void load(String date) {
+		List<Share> allShares = shareDao.getAll();		
+		logger.info("loading " + allShares.size() + " shares in " + date);
+		
+		load(allShares, date);
+	}
+
+	private void load(List<Share> shares, String date) {
+		for (Share share : shares) {
 			logger.info(share.getId() + " " + date);
 			List<Shareholding> shareholdings = web.get(share.getId(), date);
 			shareholdingDao.insert(shareholdings);

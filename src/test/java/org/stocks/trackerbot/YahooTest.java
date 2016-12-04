@@ -1,8 +1,8 @@
 package org.stocks.trackerbot;
 
 import org.junit.Test;
+import org.stocks.trackerbot.api.YFinanceAPI;
 import org.stocks.trackerbot.model.Stock;
-import org.stocks.trackerbot.yahoo.YFinanceAPI;
 
 public class YahooTest {
 

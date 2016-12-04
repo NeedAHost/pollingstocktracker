@@ -1,4 +1,6 @@
-package org.stocks.trackerbot.yahoo;
+package org.stocks.trackerbot.api;
+
+import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,6 +13,23 @@ public class YFinanceAPI {
 	private static final Logger logger = LoggerFactory.getLogger(YFinanceAPI.class);
 	private final String baseUrl = "http://finance.yahoo.com/d/quotes.csv?f=pob3p2&s=";
 
+	public void update(List<Stock> stocks) {
+		String url = baseUrl;
+		for (Stock stock : stocks) {
+			url += stock.getSymbolPadded() + ".HK,";
+		}
+		if (stocks.size() > 0) {
+			url = url.substring(0, url.length() - 1);
+		}
+		String get = HttpUtil.get(url);
+		String[] lines = get.split("\n");
+		for (int i = 0; i < stocks.size(); i++) {
+			if (i < lines.length) {
+				update(stocks.get(i), lines[i]);
+			}
+		}
+	}
+
 	// 5.45,5.44
 	public void update(Stock stock) {
 		try {
@@ -18,6 +37,10 @@ public class YFinanceAPI {
 		} catch (InterruptedException e) {
 		}
 		String get = HttpUtil.get(baseUrl + stock.getSymbolPadded() + ".HK");
+		update(stock, get);
+	}
+
+	private void update(Stock stock, String get) {
 		if (get == null || get.length() == 0) {
 			return;
 		}

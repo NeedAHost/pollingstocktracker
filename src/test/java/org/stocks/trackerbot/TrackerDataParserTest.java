@@ -24,20 +24,22 @@ public class TrackerDataParserTest {
 		System.out.println(data);
 	}
 	
-	@Ignore
+//	@Ignore
 	@Test
 	public void printCapture1() throws URISyntaxException, UnsupportedEncodingException, IOException {
 		TrackerBot bot = new TrackerBot();
+		Scanner sc = null;
 		try {
 			bot.setSource(new MockTrackerSource());
 			bot.startPolling();
 			
-			Scanner sc = new Scanner(System.in);
+			sc = new Scanner(System.in);
 			System.out.println("Waiting input to exit..");
 	        while(!sc.hasNextLine()) {        	
 	        }
 		} finally {
 			bot.stop();
+			sc.close();
 		}
 	}
 	
@@ -45,15 +47,17 @@ public class TrackerDataParserTest {
 	@Test
 	public void realTest() {
 		TrackerBot bot = new TrackerBot();
+		Scanner sc = null;
 		try {
 			bot.startPolling();
 			
-			Scanner sc = new Scanner(System.in);
+			sc = new Scanner(System.in);
 			System.out.println("Waiting input to exit..");
 	        while(!sc.hasNextLine()) {
 	        }
 		} finally {
 			bot.stop();
+			sc.close();
 		}
 	}
 }

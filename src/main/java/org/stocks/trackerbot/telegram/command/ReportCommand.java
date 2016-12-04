@@ -36,6 +36,7 @@ public class ReportCommand extends BotCommand {
 	@Override
 	public void execute(AbsSender absSender, User user, Chat chat, String[] arguments) {
 		try {
+			logger.info(commandIdentifier + " command received");
 			List<String> summarized = this.trackerBot.getRecommender().summarize();
 			for (String s : summarized) {
 				SendMessage ans = new SendMessage();
@@ -43,6 +44,7 @@ public class ReportCommand extends BotCommand {
 				ans.setChatId(chat.getId().toString());
 				ans.setText(s);
 				ans.disableWebPagePreview();
+				ans.disableNotification();
 				absSender.sendMessage(ans);
 			}		
 		} catch (TelegramApiException e) {

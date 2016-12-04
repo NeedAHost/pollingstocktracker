@@ -1,4 +1,4 @@
-package org.stocks.trackerbot.google;
+package org.stocks.trackerbot.api;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -29,6 +29,8 @@ public class GoogFinanceAPI {
 		}
 		JSONObject stockObj = arr.getJSONObject(0);
 		stock.setPrice(stockObj.getString("l"));
+		// trust google data
+		stock.setFirstSeenPrice(stock.getPrice());
 //		stock.setPriceChange(stockObj.getString("cp") + "%");
 	}
 }

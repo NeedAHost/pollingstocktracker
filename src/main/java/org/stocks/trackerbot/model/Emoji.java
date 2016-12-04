@@ -24,4 +24,7 @@ public class Emoji {
 	public static final int exclamation = 0x203C; // marked
 	public static final int mountain = 0x1F5FB; // high open 
 	public static final int barchart = 0x1F4CA; // report
+	
+	public static final int tick = 0x2705;
+	public static final int cross = 0x274C;
 }

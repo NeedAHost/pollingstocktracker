@@ -2,13 +2,16 @@ package org.stocks.trackerbot;
 
 import java.time.LocalDate;
 import java.util.Calendar;
+import java.util.Collection;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.stocks.trackerbot.model.Stock;
 import org.stocks.trackerbot.model.TrackerData;
+import org.stocks.trackerbot.tagger.Tag2Emoji;
 import org.stocks.trackerbot.telegram.TelegramHandler;
 import org.telegram.telegrambots.TelegramBotsApi;
 import org.telegram.telegrambots.exceptions.TelegramApiRequestException;
@@ -36,14 +39,16 @@ public class TrackerBot {
 	private int remainingSkipCount = 0;
 	private String lastDataId = "";
 	private LocalDate lastTimestamp = LocalDate.now();
-	private Recommender recommender = new Recommender();
+	private Recommender recommender;
 	private boolean reportSent = false;
 
 	public TrackerBot() {
+//		ApiContextInitializer.init();
 		TelegramBotsApi telegramBotsApi = new TelegramBotsApi();
 		telegramHandler = new TelegramHandler(this);
 		try {
 			telegramBotsApi.registerBot(telegramHandler);
+			recommender = new Recommender();
 		} catch (TelegramApiRequestException e) {
 			logger.error("initialize telegram fail", e);
 		}
@@ -78,14 +83,14 @@ public class TrackerBot {
 					if (Config.maxRetryCount <= retryCount) {
 						// sleep
 						int curHour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY);
-						if (curHour >= 0 && curHour <= 9) {
+						if (curHour >= 0 && curHour <= 8) {
 							// active hour
-							setRemainingSkipCount(3);
+							setRemainingSkipCount(0);
 						} else if (curHour >= 9) {
 							if (!reportSent) {
-								sentReport();
+//								sentReport();
 							}
-							setRemainingSkipCount(12);
+							setRemainingSkipCount(6);
 						}
 						retryCount = 0;
 					}
@@ -95,7 +100,8 @@ public class TrackerBot {
 					setRemainingSkipCount(0);
 				}
 				setLastDataId(pulled.getId());
-				telegramHandler.sendMessage(getRecommender().analyze(pulled));
+				Collection<Stock> analyze = getRecommender().analyze(pulled);
+				this.send(analyze);
 			} catch (Exception e) {
 				logger.error("unknown error", e);
 			}
@@ -106,7 +112,7 @@ public class TrackerBot {
 		for (String s : getRecommender().summarize()) {
 			logger.info(s);
 			telegramHandler.sendMessage(s);
-		}		
+		}
 		reportSent = true;
 	}
 
@@ -117,6 +123,26 @@ public class TrackerBot {
 			reportSent = false;
 		}
 		lastTimestamp = now;
+	}
+
+	private void send(Collection<Stock> latest) {
+		for (Stock f : latest) {
+			// msg =
+			// msg.appendCodePoint(Tag2Emoji.mapTag(f.getCategory().name()));
+			StringBuilder msg = new StringBuilder();
+			for (String t : f.getTags()) {
+				Integer i = Tag2Emoji.mapTag(t);
+				if (i != null) {
+					msg = msg.appendCodePoint(i);
+				}
+			}
+			msg = msg.append("\n" + f.printNoMarkup());
+			try {
+				Thread.sleep(1000);
+			} catch (InterruptedException e) {
+			}
+			this.telegramHandler.sendUrlImageAndCaption(f.getChartUrl(), msg.toString());
+		}
 	}
 
 	public TrackerData pullSource() {

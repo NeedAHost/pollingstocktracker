@@ -36,4 +36,8 @@ public class Tag2Emoji {
 		return i;
 	}
 	
+	public static Map<String, Integer> getMap() {
+		return map;
+	}
+	
 }

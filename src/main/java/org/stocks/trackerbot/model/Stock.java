@@ -29,6 +29,7 @@ public class Stock {
 	private String open;
 	private String prevClose;
 	private String firstSeenTime;
+	private MarkedStock marked;
 
 	private Set<String> tags = new HashSet<String>();
 
@@ -85,9 +86,6 @@ public class Stock {
 
 	public void setPrice(String price) {
 		this.price = price;
-		if (firstSeenPrice == null) {
-			this.firstSeenPrice = price;
-		}
 	}
 
 	public String getPriceChange() {
@@ -140,19 +138,36 @@ public class Stock {
 		}
 	}
 
-	private static final String printFormat = "[%1$4s:%2$4s](%3$s) %4$4s(%5$s) Vol:%6$s(%7$s) %8$s";
-
+	private static final String printFormat = "[%1$4s:%2$4s](%3$s)\nPrice: %4$4s (%5$s)\nVol: %6$s (%7$s)\n";
 	public String print() {
-		String shortName = name.length() <= 4 ? name : name.substring(0, 4);
-		return String.format(printFormat, symbol, shortName, getUrl(), price, priceChange, volume,
-				this.getVolumeChange(), this.getStartTime());
+		String tmp = String.format(printFormat, symbol, name, getUrl(), price, priceChange, volume,
+				this.getVolumeChange());
+		if (this.getMarked() != null) {
+			tmp += this.getMarked().printWithStock();
+		}
+		return tmp;
+	}
+	
+	private static final String noMarkupPrintFormat = "%1$4s:%2$4s\nPrice: %4$4s (%5$s)\nVol: %6$s (%7$s)\n";
+	public String printNoMarkup() {
+		String tmp = String.format(noMarkupPrintFormat, symbol, name, getUrl(), price, priceChange, volume,
+				this.getVolumeChange());
+		if (this.getMarked() != null) {
+			tmp += this.getMarked().printWithStock();
+		}
+		tmp += this.getUrl() + "\n";
+		return tmp;
+	}
+	
+	public String getChartUrl() {
+		return "http://chart.finance.yahoo.com/z?s=" + getSymbolPadded() + ".HK&t=1d&q=l&l=on&z=s";
 	}
 
 	private static final String summarizeFormat = "[%1$4s](%3$s) %4$s > %5$s (%6$s)";
 
 	public String printSummary() {
 		String shortName = name.length() <= 4 ? name : name.substring(0, 4);
-		return String.format(summarizeFormat, symbol, shortName, getUrl(), firstSeenPrice, price, this.getEarnPercent(),
+		return String.format(summarizeFormat, symbol, shortName, getUrl(), getFirstSeenPrice(), price, this.getEarnPercent(),
 				firstSeenTime);
 	}
 
@@ -219,7 +234,7 @@ public class Stock {
 	}
 
 	public String getEarnPercent() {
-		BigDecimal firstBd = new BigDecimal(firstSeenPrice);
+		BigDecimal firstBd = new BigDecimal(getFirstSeenPrice());
 		BigDecimal earning = new BigDecimal(price).subtract(firstBd).multiply(new BigDecimal("100")).divide(firstBd,
 				RoundingMode.HALF_UP);
 		earning = earning.setScale(2, BigDecimal.ROUND_HALF_UP);
@@ -231,6 +246,20 @@ public class Stock {
 	}
 
 	public void setFirstSeenTime(String firstSeenTime) {
-		this.firstSeenTime = firstSeenTime;
+		if (this.firstSeenPrice == null) {
+			this.firstSeenTime = firstSeenTime;
+		}
+	}
+
+	public void setFirstSeenPrice(String firstSeenPrice) {
+		this.firstSeenPrice = firstSeenPrice;
+	}
+
+	public MarkedStock getMarked() {
+		return marked;
+	}
+
+	public void setMarked(MarkedStock marked) {
+		this.marked = marked;
 	}
 }

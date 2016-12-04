@@ -67,4 +67,15 @@ public class StockTest {
 		
 		assertTrue(s1.endsWith(s2) || s2.endsWith(s1));
 	}
+	
+	@Test
+	public void symbolTest2() {
+		Stock s = new Stock("0055");
+		
+		assertEquals("0055", s.getSymbolPadded());
+		
+		Stock s2 = new Stock("0000");
+		
+		assertEquals("0000", s2.getSymbolPadded());
+	}
 }

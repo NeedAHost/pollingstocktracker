@@ -36,6 +36,7 @@ public class ScanCommand extends BotCommand {
 	@Override
 	public void execute(AbsSender absSender, User user, Chat chat, String[] arguments) {
 		try {
+			logger.info(commandIdentifier + " command received");
 			SendMessage ans = new SendMessage();
 			ans.setChatId(chat.getId().toString());
 			if (arguments == null || arguments.length == 0) {
@@ -52,6 +53,7 @@ public class ScanCommand extends BotCommand {
 				reply.append(" " + tag + "\n");
 			}
 			ans.setText(reply.toString());
+			ans.disableNotification();
 			absSender.sendMessage(ans);
 		} catch (TelegramApiException e) {
 			logger.error("command execute fail", e);

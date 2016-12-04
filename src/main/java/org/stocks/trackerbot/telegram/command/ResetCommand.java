@@ -40,10 +40,12 @@ public class ResetCommand extends BotCommand {
 	@Override
 	public void execute(AbsSender absSender, User user, Chat chat, String[] arguments) {
 		try {
+			logger.info(commandIdentifier + " command received");
 			reset();
 			SendMessage ans = new SendMessage();
 			ans.setChatId(chat.getId().toString());
 			ans.setText("acknowledged");
+			ans.disableNotification();
 			absSender.sendMessage(ans);
 		} catch (TelegramApiException e) {
 			logger.error("command execute fail", e);

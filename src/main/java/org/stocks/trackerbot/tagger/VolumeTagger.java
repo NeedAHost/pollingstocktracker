@@ -1,7 +1,7 @@
 package org.stocks.trackerbot.tagger;
 
 import java.math.BigDecimal;
-import java.util.Collection;
+import java.util.List;
 
 import org.stocks.trackerbot.model.Stock;
 import org.stocks.trackerbot.model.TrackerData;
@@ -31,7 +31,7 @@ public class VolumeTagger implements ITagger {
 	}
 
 	@Override
-	public void tag(Collection<Stock> stocks) {
+	public void tag(List<Stock> stocks) {
 		for (Stock stock : stocks) {
 			if (stock.getAvgVolume() != null) {
 				BigDecimal avgVolume = NumberNormalizer.normalize(stock.getAvgVolume());

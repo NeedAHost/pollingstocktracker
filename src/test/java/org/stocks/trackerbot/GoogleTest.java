@@ -3,7 +3,7 @@ package org.stocks.trackerbot;
 import static org.junit.Assert.*;
 
 import org.junit.Test;
-import org.stocks.trackerbot.google.GoogFinanceAPI;
+import org.stocks.trackerbot.api.GoogFinanceAPI;
 import org.stocks.trackerbot.model.Stock;
 
 public class GoogleTest {

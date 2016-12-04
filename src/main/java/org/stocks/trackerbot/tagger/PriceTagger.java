@@ -1,7 +1,7 @@
 package org.stocks.trackerbot.tagger;
 
 import java.math.BigDecimal;
-import java.util.Collection;
+import java.util.List;
 
 import org.stocks.trackerbot.model.Stock;
 import org.stocks.trackerbot.model.TrackerData;
@@ -33,7 +33,7 @@ public class PriceTagger implements ITagger {
 	}
 
 	@Override
-	public void tag(Collection<Stock> stocks) {
+	public void tag(List<Stock> stocks) {
 		for (Stock stock : stocks) {
 			BigDecimal price = NumberNormalizer.normalize(stock.getPrice());
 			if (price != null)  {

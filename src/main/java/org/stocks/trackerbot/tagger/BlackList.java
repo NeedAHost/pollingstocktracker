@@ -68,7 +68,7 @@ public class BlackList implements ITagger {
 	}
 	
 	@Override
-	public void tag(Collection<Stock> stocks) {
+	public void tag(List<Stock> stocks) {
 		for (Stock s : stocks) {
 			String scan = scan(s.getSymbol());
 			s.getTags().add(scan);

@@ -10,7 +10,8 @@ import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.stocks.trackerbot.google.GoogFinanceAPI;
+import org.stocks.trackerbot.api.GoogFinanceAPI;
+import org.stocks.trackerbot.api.YFinanceAPI;
 import org.stocks.trackerbot.model.Emoji;
 import org.stocks.trackerbot.model.Stock;
 import org.stocks.trackerbot.model.TrackerData;
@@ -21,7 +22,6 @@ import org.stocks.trackerbot.tagger.MarkedTagger;
 import org.stocks.trackerbot.tagger.PriceTagger;
 import org.stocks.trackerbot.tagger.Tag2Emoji;
 import org.stocks.trackerbot.tagger.VolumeTagger;
-import org.stocks.trackerbot.yahoo.YFinanceAPI;
 
 public class Recommender {
 
@@ -31,7 +31,7 @@ public class Recommender {
 	private List<ITagger> expensiveTaggers = new ArrayList<ITagger>();
 	private YFinanceAPI yFin = new YFinanceAPI();
 	private GoogFinanceAPI goog = new GoogFinanceAPI(); 
-
+	
 	public Recommender() {
 		cheapTaggers.add(new MarkedTagger());
 		cheapTaggers.add(new VolumeTagger());
@@ -44,7 +44,7 @@ public class Recommender {
 		getRecommended().clear();
 	}
 
-	public String analyze(TrackerData data) {
+	public Collection<Stock> analyze(TrackerData data) {
 		HashSet<Stock> recommending = new HashSet<Stock>(filter(data));
 		for (Iterator<Stock> iterator = recommending.iterator(); iterator.hasNext();) {
 			Stock ing = iterator.next();
@@ -61,7 +61,7 @@ public class Recommender {
 		}
 
 		for (ITagger t : this.expensiveTaggers) {
-			t.tag(recommending);
+			t.tag(new ArrayList<Stock>(recommending));
 		}
 		
 		for (Stock r : recommending) {
@@ -82,8 +82,7 @@ public class Recommender {
 		// marked at first
 		ordered.addAll(recommending);
 
-		String msg = getLatestRecommendMessage(ordered);
-		return msg;
+		return ordered;
 	}
 
 	public List<String> summarize() {
@@ -127,22 +126,6 @@ public class Recommender {
 		return ret;
 	}
 
-	private String getLatestRecommendMessage(Collection<Stock> latest) {
-		StringBuilder msg = new StringBuilder();
-		for (Stock f : latest) {
-			// msg =
-			// msg.appendCodePoint(Tag2Emoji.mapTag(f.getCategory().name()));
-			for (String t : f.getTags()) {
-				Integer i = Tag2Emoji.mapTag(t);
-				if (i != null) {
-					msg = msg.appendCodePoint(i);
-				}
-			}
-			msg = msg.append(" " + f.print() + "\n");
-		}
-		return msg.toString();
-	}
-
 	private List<Stock> filter(TrackerData data) {
 		for (ITagger t : this.cheapTaggers) {
 			t.tag(data);
@@ -150,22 +133,19 @@ public class Recommender {
 		List<Stock> filtered = new ArrayList<Stock>();
 		for (Stock up : data.getUps()) {
 			Set<String> tags = up.getTags();
-			if (tags.contains(MarkedTagger.MARKED) || (!tags.contains(PriceTagger.HIGH)
-					&& !tags.contains(PriceTagger.LOW) && !tags.contains(VolumeTagger.LOW))) {
+			if (tags.contains(MarkedTagger.MARKED)) {
 				filtered.add(up);
 			}
 		}
 		for (Stock pending : data.getPendings()) {
 			Set<String> tags = pending.getTags();
-			if (tags.contains(MarkedTagger.MARKED) || (!tags.contains(PriceTagger.HIGH)
-					&& !tags.contains(PriceTagger.LOW) && !tags.contains(VolumeTagger.LOW))) {
+			if (tags.contains(MarkedTagger.MARKED)) {
 				filtered.add(pending);
 			}
 		}
 		for (Stock nh : data.getNewHighs()) {
 			Set<String> tags = nh.getTags();
-			if (tags.contains(MarkedTagger.MARKED) || (!tags.contains(PriceTagger.HIGH)
-					&& !tags.contains(PriceTagger.LOW) && !tags.contains(VolumeTagger.LOW))) {
+			if (tags.contains(MarkedTagger.MARKED)) {
 				filtered.add(nh);
 			}
 		}

@@ -1,63 +1,45 @@
 package org.stocks.trackerbot.tagger;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.Collection;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.stocks.trackerbot.Config;
+import org.stocks.trackerbot.dao.MarkedStockDao;
+import org.stocks.trackerbot.model.MarkedStock;
 import org.stocks.trackerbot.model.Stock;
 import org.stocks.trackerbot.model.TrackerData;
 
 public class MarkedTagger implements ITagger {
 	private static final Logger logger = LoggerFactory.getLogger(MarkedTagger.class);
-	
+
 	public static final String MARKED = "marked";
-	private List<String> marked = new ArrayList<String>();
+	private MarkedStockDao dao = new MarkedStockDao();
+	private Set<MarkedStock> marked = new LinkedHashSet<MarkedStock>();
 
 	public MarkedTagger() {
-		File file = new File(Config.markedFilePath);
-		try (InputStream is = new FileInputStream(file);
-				InputStreamReader isr = new InputStreamReader(is, "UTF-8");
-				BufferedReader br = new BufferedReader(isr);) {
-			List<String> temp = new ArrayList<String>();
-			String line = null;
-			while ((line = br.readLine()) != null) {
-				temp.add(String.format("%04d", Integer.parseInt(line)));
-			}
-			setMarked(temp);
-		} catch (Exception e) {
-			logger.error("marked tagger init fail", e);
-		}
-	}
-	
-	public List<String> getMarked() {
-		return marked;
-	}
-
-	public void setMarked(List<String> marked) {
-		this.marked = marked;
 	}
 
 	@Override
 	public void tag(TrackerData data) {
+		marked = dao.getAll();
 		tag(data.getUps());
 		tag(data.getNewHighs());
 		tag(data.getPendings());
 	}
 
 	@Override
-	public void tag(Collection<Stock> stocks) {
+	public void tag(List<Stock> stocks) {
 		for (Stock s : stocks) {
-			if (marked.contains(s.getSymbolPadded())) {
-				s.getTags().add(MARKED);
-			}
+			for (MarkedStock ms : marked) {
+				if (ms.getSymbol().endsWith(s.getSymbolPadded())) {
+					s.getTags().add(MARKED);
+					s.setMarked(ms);
+					ms.setStock(s);
+					break;
+				}
+			}			
 		}
 	}
 

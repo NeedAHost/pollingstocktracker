@@ -2,11 +2,11 @@ package org.stocks.trackerbot.tagger;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.Collection;
+import java.util.List;
 
+import org.stocks.trackerbot.api.YFinanceAPI;
 import org.stocks.trackerbot.model.Stock;
 import org.stocks.trackerbot.model.TrackerData;
-import org.stocks.trackerbot.yahoo.YFinanceAPI;
 
 public class HighOpenTagger implements ITagger {
 
@@ -30,7 +30,8 @@ public class HighOpenTagger implements ITagger {
 	}
 
 	@Override
-	public void tag(Collection<Stock> stocks) {
+	public void tag(List<Stock> stocks) {
+		yFin.update(stocks);
 		for (Stock stock : stocks) {
 			yFin.update(stock);
 			if (stock.getOpen() != null && stock.getPrevClose() != null) {
