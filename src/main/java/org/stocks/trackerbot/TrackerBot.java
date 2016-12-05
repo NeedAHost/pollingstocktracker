@@ -88,7 +88,7 @@ public class TrackerBot {
 							setRemainingSkipCount(0);
 						} else if (curHour >= 9) {
 							if (!reportSent) {
-//								sentReport();
+								sentReport();
 							}
 							setRemainingSkipCount(6);
 						}

@@ -44,7 +44,7 @@ public class HelpCommand extends BotCommand {
 				sb.appendCodePoint(e.getValue()).append(" " + e.getKey() + "\n");
 			}
 			SendMessage ans = new SendMessage();
-			ans.setChatId(Config.chatId.toString());
+			ans.setChatId(chat.getId().toString());
 			ans.setText(sb.toString());
 			ans.disableNotification();
 			absSender.sendMessage(ans);

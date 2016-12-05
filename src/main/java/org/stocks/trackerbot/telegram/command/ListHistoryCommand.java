@@ -36,9 +36,9 @@ public class ListHistoryCommand extends BotCommand {
 	public void execute(AbsSender absSender, User user, Chat chat, String[] arguments) {
 		try {
 			logger.info(commandIdentifier + " command received");
-			String m = "Recommended: ";
+			String m = "Recommended:\n";
 			for (Stock s : trackerBot.getRecommender().getRecommended()) {
-				m += s.getSymbolPadded() + " ";
+				m += s.getSymbolPadded() + " " + s.getFirstSeenTime() + "\n";
 			}
 			SendMessage ans = new SendMessage();
 			ans.setChatId(chat.getId().toString());

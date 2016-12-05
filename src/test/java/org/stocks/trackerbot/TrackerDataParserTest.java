@@ -24,7 +24,7 @@ public class TrackerDataParserTest {
 		System.out.println(data);
 	}
 	
-//	@Ignore
+	@Ignore
 	@Test
 	public void printCapture1() throws URISyntaxException, UnsupportedEncodingException, IOException {
 		TrackerBot bot = new TrackerBot();

@@ -88,8 +88,8 @@ public class MarkedStock {
 			return;
 		}
 		BigDecimal ret = new BigDecimal(startPrice);
-		ret.multiply(scale);
-		ret.setScale(2, RoundingMode.HALF_UP);
+		ret = ret.multiply(scale);
+		ret = ret.setScale(2, RoundingMode.HALF_UP);
 		endPrice = ret.toString();
 	}
 

@@ -143,12 +143,6 @@ public class Recommender {
 				filtered.add(pending);
 			}
 		}
-		for (Stock nh : data.getNewHighs()) {
-			Set<String> tags = nh.getTags();
-			if (tags.contains(MarkedTagger.MARKED)) {
-				filtered.add(nh);
-			}
-		}
 		return filtered;
 	}
 
