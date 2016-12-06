@@ -40,6 +40,9 @@ public class MarkedStockDao {
 					ms.setStartPrice(split[1]);
 					ms.setEndPrice(split[2]);
 					ms.setShareholding(split[3]);
+					if (split.length >= 5) {
+						ms.setCompletionDate(split[4]);
+					}
 					temp.add(ms);
 				} catch (Exception e) {
 					logger.error("invalid format: " + line, e);

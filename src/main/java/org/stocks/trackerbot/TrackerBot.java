@@ -83,10 +83,10 @@ public class TrackerBot {
 					if (Config.maxRetryCount <= retryCount) {
 						// sleep
 						int curHour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY);
-						if (curHour >= 0 && curHour <= 8) {
+						if (curHour >= 8 && curHour <= 16) {
 							// active hour
 							setRemainingSkipCount(0);
-						} else if (curHour >= 9) {
+						} else if (curHour >= 17) {
 							if (!reportSent) {
 								sentReport();
 							}

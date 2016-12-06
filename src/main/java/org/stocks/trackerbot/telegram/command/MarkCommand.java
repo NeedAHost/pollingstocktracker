@@ -17,7 +17,7 @@ import org.telegram.telegrambots.exceptions.TelegramApiException;
 public class MarkCommand extends BotCommand {
 
 	private static final String commandIdentifier = "mark";
-	private static final String description = "mark a stock e.g. [/mark symbol price shareholding]";
+	private static final String description = "mark a stock e.g. [/mark symbol price shareholding date(yyyy-MM-dd)(optional)]";
 	private TrackerBot trackerBot;
 	private MarkedStockDao dao = new MarkedStockDao(); // hope there is no
 														// concurrency
@@ -36,7 +36,8 @@ public class MarkCommand extends BotCommand {
 	}
 
 	private static final Logger logger = LoggerFactory.getLogger(MarkCommand.class);
-
+	
+	
 	@Override
 	public void execute(AbsSender absSender, User user, Chat chat, String[] arguments) {
 		try {
@@ -45,13 +46,16 @@ public class MarkCommand extends BotCommand {
 			ans.setChatId(chat.getId().toString());
 			String m = "";
 			if (arguments == null || arguments.length < 3) {
-				m += "Send something like '/mark symbol price shareholding'\n";
+				m += "Send something like '/mark symbol price shareholding optional:date(yyyy-MM-dd)'\n";
 			} else {
 				MarkedStock inputMs = new MarkedStock();
 				inputMs.setSymbol(arguments[0]);
 				inputMs.setStartPrice(arguments[1]);
 				inputMs.setEndPriceByStartPrice();
 				inputMs.setShareholding(arguments[2]);
+				if (arguments.length == 4) {
+					inputMs.setCompletionDate(arguments[3]);
+				}
 				dao.addOrUpdate(inputMs);
 			}
 			

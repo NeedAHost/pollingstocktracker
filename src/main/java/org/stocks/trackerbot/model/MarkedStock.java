@@ -2,6 +2,8 @@ package org.stocks.trackerbot.model;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.regex.Pattern;
 
 import org.stocks.trackerbot.util.NumberNormalizer;
@@ -13,6 +15,7 @@ public class MarkedStock {
 	private String endPrice;
 	private String shareholding;
 	private Stock stock;
+	private LocalDate completionDate;
 
 	private static final BigDecimal scale = new BigDecimal("1.3");
 
@@ -51,6 +54,9 @@ public class MarkedStock {
 			} else {
 				tmp.appendCodePoint(Emoji.cross);
 			}
+		}
+		if (this.completionDate != null) {
+			tmp.append("\nCompletion: " + this.completionDate.toString());
 		}
 		tmp.append("\n");
 		return tmp.toString();
@@ -103,11 +109,19 @@ public class MarkedStock {
 
 	@Override
 	public String toString() {
-		return symbol + "," + startPrice + "," + endPrice + "," + shareholding;
+		String m = symbol + "," + startPrice + "," + endPrice + "," + shareholding + ",";
+		if (this.getCompletionDate() != null) {
+			m += getCompletionDate().toString();
+		}
+		return m;
 	}
 
 	public String print() {
-		return symbol + " (" + startPrice + ", " + endPrice + ") " + shareholding + "M";
+		String m = symbol + ", " + startPrice + ", " + shareholding + "M";
+		if (this.getCompletionDate() != null) {
+			m += ", " + getCompletionDate();
+		}
+		return m;
 	}
 
 	public Stock getStock() {
@@ -118,4 +132,22 @@ public class MarkedStock {
 		this.stock = stock;
 	}
 
+	public LocalDate getCompletionDate() {
+		return completionDate;
+	}
+
+	public void setCompletionDate(LocalDate completionDate) {
+		this.completionDate = completionDate;
+	}
+
+	private static final DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+	public void setCompletionDate(String completionDate) {
+		if (completionDate == null || completionDate.length() == 0) {
+			return;
+		}
+		try {
+			this.completionDate = LocalDate.parse(completionDate, dtf);
+		} catch (Exception e) {
+		}
+	}
 }

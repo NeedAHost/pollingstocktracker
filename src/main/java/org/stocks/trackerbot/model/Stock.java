@@ -6,6 +6,7 @@ import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.Random;
 import java.util.Set;
 
 import org.slf4j.Logger;
@@ -159,8 +160,10 @@ public class Stock {
 		return tmp;
 	}
 	
-	public String getChartUrl() {
-		return "http://chart.finance.yahoo.com/z?s=" + getSymbolPadded() + ".HK&t=1d&q=l&l=on&z=s";
+	private final static Random rnd = new Random();
+	public String getChartUrl() {		
+		// no cache
+		return "http://chart.finance.yahoo.com/z?s=" + getSymbolPadded() + ".HK&t=1d&q=l&l=on&z=s&a=" + rnd.nextInt();
 	}
 
 	private static final String summarizeFormat = "[%1$4s](%3$s) %4$s > %5$s (%6$s)";
@@ -252,7 +255,9 @@ public class Stock {
 	}
 
 	public void setFirstSeenPrice(String firstSeenPrice) {
-		this.firstSeenPrice = firstSeenPrice;
+		if (this.firstSeenPrice == null) {
+			this.firstSeenPrice = firstSeenPrice;
+		}
 	}
 
 	public MarkedStock getMarked() {
