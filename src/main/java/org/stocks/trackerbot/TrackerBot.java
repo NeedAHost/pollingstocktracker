@@ -130,6 +130,7 @@ public class TrackerBot {
 			// msg =
 			// msg.appendCodePoint(Tag2Emoji.mapTag(f.getCategory().name()));
 			StringBuilder msg = new StringBuilder();
+			msg = msg.appendCodePoint(Tag2Emoji.mapTag(f.getCategory().name()));
 			for (String t : f.getTags()) {
 				Integer i = Tag2Emoji.mapTag(t);
 				if (i != null) {

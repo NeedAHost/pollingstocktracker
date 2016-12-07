@@ -137,12 +137,12 @@ public class Recommender {
 				filtered.add(up);
 			}
 		}
-//		for (Stock pending : data.getPendings()) {
-//			Set<String> tags = pending.getTags();
-//			if (tags.contains(MarkedTagger.MARKED)) {
-//				filtered.add(pending);
-//			}
-//		}
+		for (Stock pending : data.getPendings()) {
+			Set<String> tags = pending.getTags();
+			if (tags.contains(MarkedTagger.MARKED)) {
+				filtered.add(pending);
+			}
+		}
 		return filtered;
 	}
 
