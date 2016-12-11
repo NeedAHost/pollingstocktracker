@@ -2,6 +2,7 @@ package org.stocks.trackerbot;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
@@ -26,7 +27,7 @@ import org.stocks.trackerbot.tagger.VolumeTagger;
 public class Recommender {
 
 	private static final Logger logger = LoggerFactory.getLogger(Recommender.class);
-	private Set<Stock> recommended = new LinkedHashSet<Stock>();
+	private Set<Stock> recommended = Collections.synchronizedSet(new LinkedHashSet<Stock>());
 	private List<ITagger> cheapTaggers = new ArrayList<ITagger>();
 	private List<ITagger> expensiveTaggers = new ArrayList<ITagger>();
 	private YFinanceAPI yFin = new YFinanceAPI();
@@ -141,6 +142,12 @@ public class Recommender {
 			Set<String> tags = pending.getTags();
 			if (tags.contains(MarkedTagger.MARKED)) {
 				filtered.add(pending);
+			}
+		}
+		for (Stock pullback : data.getPullBacks()) {
+			Set<String> tags = pullback.getTags();
+			if (tags.contains(MarkedTagger.MARKED)) {
+				filtered.add(pullback);
 			}
 		}
 		return filtered;

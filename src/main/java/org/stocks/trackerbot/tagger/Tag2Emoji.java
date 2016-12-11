@@ -1,5 +1,6 @@
 package org.stocks.trackerbot.tagger;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -8,7 +9,7 @@ import org.stocks.trackerbot.model.Emoji;
 
 public class Tag2Emoji {
 
-	private static Map<String, Integer> map = new HashMap<String, Integer>();
+	private static Map<String, Integer> map = Collections.synchronizedMap(new HashMap<String, Integer>());
 	
 	static {
 		map.put(BlackList.HIGH_RISK, Emoji.dragon);
@@ -22,6 +23,7 @@ public class Tag2Emoji {
 		map.put(Category.UP.name(), Emoji.volcano);
 		map.put(Category.PENDING.name(), Emoji.fire);
 		map.put(Category.NEW_HIGH.name(), Emoji.rocket);
+		map.put(Category.PULL_BACK.name(), Emoji.scream);
 		map.put(MarkedTagger.MARKED, Emoji.exclamation);
 		map.put(VolumeTagger.LOW, Emoji.fallingLeaf);
 		map.put(PriceTagger.HIGH, Emoji.moneyBag);

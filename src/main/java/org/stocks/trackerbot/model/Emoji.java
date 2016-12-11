@@ -5,6 +5,7 @@ public class Emoji {
 	public static final int volcano = 0x1F30B; // new high
 	public static final int fire = 0x1F525; // pending
 	public static final int rocket = 0x1F680; // up
+	public static final int scream = 0x1F631; // pull back
 	
 	public static final int train = 0x1F684;
 	public static final int noEntrySign = 0x1F6AB;

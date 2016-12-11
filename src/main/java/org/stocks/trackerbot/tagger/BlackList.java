@@ -4,7 +4,7 @@ import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -18,7 +18,7 @@ import org.stocks.trackerbot.model.TrackerData;
 public class BlackList implements ITagger {
 
 	private static final Logger logger = LoggerFactory.getLogger(BlackList.class);
-	private Map<String, List<String>> blackList = new HashMap<String, List<String>>();
+	private Map<String, List<String>> blackList = Collections.synchronizedMap(new HashMap<String, List<String>>());
 	private List<String> headers = new ArrayList<String>();
 
 	public static final String CLEAN = "clean";

@@ -1,5 +1,6 @@
 package org.stocks.trackerbot.tagger;
 
+import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -16,7 +17,7 @@ public class MarkedTagger implements ITagger {
 
 	public static final String MARKED = "marked";
 	private MarkedStockDao dao = new MarkedStockDao();
-	private Set<MarkedStock> marked = new LinkedHashSet<MarkedStock>();
+	private Set<MarkedStock> marked = Collections.synchronizedSet(new LinkedHashSet<MarkedStock>());
 
 	public MarkedTagger() {
 	}
@@ -27,6 +28,7 @@ public class MarkedTagger implements ITagger {
 		tag(data.getUps());
 		tag(data.getNewHighs());
 		tag(data.getPendings());
+		tag(data.getPullBacks());
 	}
 
 	@Override
