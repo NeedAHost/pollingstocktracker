@@ -64,7 +64,7 @@ public class BlackList implements ITagger {
 		// tag(data.getMcs());
 		tag(data.getNewHighs());
 		tag(data.getPendings());
-		// tag(data.getPullBacks());
+		tag(data.getPullBacks());
 	}
 	
 	@Override

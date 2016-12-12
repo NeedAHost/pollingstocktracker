@@ -138,16 +138,20 @@ public class Recommender {
 				filtered.add(up);
 			}
 		}
-		for (Stock pending : data.getPendings()) {
-			Set<String> tags = pending.getTags();
-			if (tags.contains(MarkedTagger.MARKED)) {
-				filtered.add(pending);
+		if (Config.pendingOn) {
+			for (Stock pending : data.getPendings()) {
+				Set<String> tags = pending.getTags();
+				if (tags.contains(MarkedTagger.MARKED)) {
+					filtered.add(pending);
+				}
 			}
 		}
-		for (Stock pullback : data.getPullBacks()) {
-			Set<String> tags = pullback.getTags();
-			if (tags.contains(MarkedTagger.MARKED)) {
-				filtered.add(pullback);
+		if (Config.pullBackOn) {
+			for (Stock pullback : data.getPullBacks()) {
+				Set<String> tags = pullback.getTags();
+				if (tags.contains(MarkedTagger.MARKED)) {
+					filtered.add(pullback);
+				}
 			}
 		}
 		return filtered;

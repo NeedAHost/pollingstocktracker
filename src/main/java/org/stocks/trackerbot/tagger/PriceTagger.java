@@ -29,7 +29,7 @@ public class PriceTagger implements ITagger {
 		tag(data.getPendings());
 //		tag(data.getMcs());
 		tag(data.getNewHighs());
-//		tag(data.getPullBacks());
+		tag(data.getPullBacks());
 	}
 
 	@Override

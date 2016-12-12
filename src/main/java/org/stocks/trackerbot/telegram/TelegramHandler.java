@@ -10,6 +10,8 @@ import org.stocks.trackerbot.telegram.command.MarkCommand;
 import org.stocks.trackerbot.telegram.command.ReportCommand;
 import org.stocks.trackerbot.telegram.command.ResetCommand;
 import org.stocks.trackerbot.telegram.command.ScanCommand;
+import org.stocks.trackerbot.telegram.command.SetPendingCommand;
+import org.stocks.trackerbot.telegram.command.SetPullBackCommand;
 import org.stocks.trackerbot.telegram.command.StopCommand;
 import org.stocks.trackerbot.telegram.command.UnmarkCommand;
 import org.telegram.telegrambots.api.methods.send.SendMessage;
@@ -36,6 +38,8 @@ public class TelegramHandler extends TelegramLongPollingCommandBot {
 		register(new MarkCommand(trackerBot));
 		register(new UnmarkCommand(trackerBot));
 		register(new HelpCommand(trackerBot));
+		register(new SetPendingCommand(trackerBot));
+		register(new SetPullBackCommand(trackerBot));
 	}
 
 	@Override
