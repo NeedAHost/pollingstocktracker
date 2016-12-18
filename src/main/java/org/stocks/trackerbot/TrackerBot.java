@@ -1,16 +1,21 @@
 package org.stocks.trackerbot;
 
+import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
+import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.stocks.trackerbot.hkex.HkexNewsWeb;
 import org.stocks.trackerbot.model.Stock;
 import org.stocks.trackerbot.model.TrackerData;
+import org.stocks.trackerbot.model.hkex.News;
 import org.stocks.trackerbot.tagger.Tag2Emoji;
 import org.stocks.trackerbot.telegram.TelegramHandler;
 import org.telegram.telegrambots.TelegramBotsApi;
@@ -32,6 +37,7 @@ public class TrackerBot {
 	private static final Logger logger = LoggerFactory.getLogger(TrackerBot.class);
 	private TrackerSource source = new TrackerSource();
 	private TrackerDataParser parser = new TrackerDataParser();
+	private HkexNewsWeb newsWeb = new HkexNewsWeb();
 	private ScheduledExecutorService executorService;
 	private TelegramHandler telegramHandler;
 
@@ -41,9 +47,11 @@ public class TrackerBot {
 	private LocalDate lastTimestamp = LocalDate.now();
 	private Recommender recommender;
 	private boolean reportSent = false;
+	
+	private News lastNews = null;
 
 	public TrackerBot() {
-//		ApiContextInitializer.init();
+		// ApiContextInitializer.init();
 		TelegramBotsApi telegramBotsApi = new TelegramBotsApi();
 		telegramHandler = new TelegramHandler(this);
 		try {
@@ -82,30 +90,63 @@ public class TrackerBot {
 					retryCount++;
 					if (Config.maxRetryCount <= retryCount) {
 						// sleep
-						int curHour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY);
-						if (curHour >= 8 && curHour <= 16) {
-							// active hour
-							setRemainingSkipCount(0);
-						} else if (curHour >= 17) {
-							if (!reportSent) {
-								sentReport();
-							}
+						LocalDate now = LocalDate.now();
+						if (now.getDayOfWeek() == DayOfWeek.SATURDAY 
+								|| now.getDayOfWeek() == DayOfWeek.SUNDAY) {
 							setRemainingSkipCount(6);
+						} else {
+							int curHour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY);
+							if (curHour >= 8 && curHour <= 16) {
+								// active hour
+								setRemainingSkipCount(0);
+							} else if (curHour >= 17) {
+								if (!reportSent) {
+									sentReport();
+								}
+								setRemainingSkipCount(6);
+							}							
 						}
 						retryCount = 0;
 					}
-					return;
 				} else {
 					retryCount = 0;
 					setRemainingSkipCount(0);
-				}
-				setLastDataId(pulled.getId());
-				Collection<Stock> analyze = getRecommender().analyze(pulled);
-				this.send(analyze);
+					setLastDataId(pulled.getId());
+					Collection<Stock> analyze = getRecommender().analyze(pulled);
+					this.send(analyze);
+				}				
+				List<News> latestNews = this.getLatestNews();
+				this.send(latestNews);				
 			} catch (Exception e) {
 				logger.error("unknown error", e);
 			}
 		}, 0, Config.pollPeriod, TimeUnit.MINUTES);
+	}
+
+	private List<News> getLatestNews() {
+		// find new news
+		List<News> latestNews = new ArrayList<News>();
+		List<News> newsList = newsWeb.getNewsList();
+		if (lastNews != null) {
+			for (News n : newsList) {
+				if (lastNews.before(n)) {
+					latestNews.add(n);
+				}
+			}	
+		} else {
+			latestNews = newsList;
+		}
+		// update last news
+		for (News n : latestNews) {
+			if (lastNews == null) {
+				lastNews = n;
+			} else {
+				if (lastNews.before(n)) {
+					lastNews = n;
+				}
+			}
+		}
+		return latestNews; 
 	}
 
 	private void sentReport() {
@@ -127,8 +168,6 @@ public class TrackerBot {
 
 	private void send(Collection<Stock> latest) {
 		for (Stock f : latest) {
-			// msg =
-			// msg.appendCodePoint(Tag2Emoji.mapTag(f.getCategory().name()));
 			StringBuilder msg = new StringBuilder();
 			msg = msg.appendCodePoint(Tag2Emoji.mapTag(f.getCategory().name()));
 			for (String t : f.getTags()) {
@@ -144,6 +183,16 @@ public class TrackerBot {
 			}
 			this.telegramHandler.sendUrlImageAndCaption(f.getChartUrl(), msg.toString());
 		}
+	}
+		
+	private void send(List<News> latestNews) {
+		for (News n : latestNews) {
+			try {
+				Thread.sleep(1000);
+			} catch (InterruptedException e) {
+			}
+			this.telegramHandler.sendMessage(n.print());
+		}		
 	}
 
 	public TrackerData pullSource() {

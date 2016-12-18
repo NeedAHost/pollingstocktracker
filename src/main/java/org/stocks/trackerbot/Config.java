@@ -48,6 +48,7 @@ public class Config {
 		sb.append("token=" + token + "\n");
 		sb.append("pullBackOn=" + pullBackOn + "\n");
 		sb.append("pendingOn=" + pendingOn + "\n");
+		sb.append("markedFilePath=" + markedFilePath + "\n");
 		
 		File file = new File(Config.selectedConfigFilePath);
 		try (Writer writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), "utf-8"))) {

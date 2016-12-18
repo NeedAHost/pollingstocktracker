@@ -25,7 +25,7 @@ public class HttpUtil {
 			con.setRequestMethod("GET");
 
 			int responseCode = con.getResponseCode();
-			BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
+			BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream(), "UTF-8"));
 			String inputLine;
 			StringBuffer response = new StringBuffer();
 
@@ -63,7 +63,7 @@ public class HttpUtil {
 			}
 			ret[0] = cookie;
 			
-			BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
+			BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream(), "UTF-8"));
 			String inputLine;
 			StringBuffer response = new StringBuffer();
 
@@ -96,7 +96,7 @@ public class HttpUtil {
 
 			int responseCode = con.getResponseCode();
 
-			BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
+			BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream(), "UTF-8"));
 			String inputLine;
 			StringBuffer response = new StringBuffer();
 
