@@ -54,7 +54,7 @@ public class HkexNewsWeb {
 	
 	private final static DateTimeFormatter yyyyMMdd = DateTimeFormatter.ofPattern("yyyyMMdd");
 	
-	public String getTodayPostParams(SessionData session) {
+	public String getTodayPlacingParams(SessionData session) {
 		StringBuilder sb = new StringBuilder();
 		sb.append(session.toString());		
 		LocalDate today = LocalDate.now();
@@ -73,11 +73,47 @@ public class HkexNewsWeb {
 		sb.append("&" + URLEncoder.encode("ctl00$ddlTierTwo") + "=59,1,7");
 		sb.append("&" + URLEncoder.encode("ctl00$ddlTierTwoGroup") + "=26,5");
 		sb.append("&" + URLEncoder.encode("ctl00$txtKeyWord") + "=");
-		sb.append("&" + URLEncoder.encode("ctl00$sel_DateOfReleaseFrom_d") + "=" + yesterday.getDayOfMonth());
-		sb.append("&" + URLEncoder.encode("ctl00$sel_DateOfReleaseFrom_m") + "=" + yesterday.getMonthValue());
+		sb.append("&" + URLEncoder.encode("ctl00$sel_DateOfReleaseFrom_d") + "=" + pad00(yesterday.getDayOfMonth()));
+		sb.append("&" + URLEncoder.encode("ctl00$sel_DateOfReleaseFrom_m") + "=" + pad00(yesterday.getMonthValue()));
 		sb.append("&" + URLEncoder.encode("ctl00$sel_DateOfReleaseFrom_y") + "=" + yesterday.getYear());
-		sb.append("&" + URLEncoder.encode("ctl00$sel_DateOfReleaseTo_d") + "=" + today.getDayOfMonth());
-		sb.append("&" + URLEncoder.encode("ctl00$sel_DateOfReleaseTo_m") + "=" + today.getMonthValue());
+		sb.append("&" + URLEncoder.encode("ctl00$sel_DateOfReleaseTo_d") + "=" + pad00(today.getDayOfMonth()));
+		sb.append("&" + URLEncoder.encode("ctl00$sel_DateOfReleaseTo_m") + "=" + pad00(today.getMonthValue()));
+		sb.append("&" + URLEncoder.encode("ctl00$sel_DateOfReleaseTo_y") + "=" + today.getYear());
+		sb.append("&" + URLEncoder.encode("ctl00$rdo_SelectDateOfRelease") + "=rbManualRange");
+		sb.append("&" + URLEncoder.encode("ctl00$sel_defaultDateRange") + "=SevenDays");
+		sb.append("&" + URLEncoder.encode("ctl00$rdo_SelectSortBy") + "=rbDateTime");
+		System.out.println(sb.toString());
+		return sb.toString();
+	}
+	
+	private String pad00(int s) {
+		return String.format("%02d", s);
+	}
+	
+	public String getTodayAcquiringParams(SessionData session) {
+		StringBuilder sb = new StringBuilder();
+		sb.append(session.toString());		
+		LocalDate today = LocalDate.now();
+		String todayStr = today.format(yyyyMMdd);
+		LocalDate yesterday = today.minusDays(1);
+		sb.append("&" + URLEncoder.encode("ctl00$txt_today") + "=" + todayStr);
+		sb.append("&" + URLEncoder.encode("ctl00$hfStatus") + "=ACM");
+		sb.append("&" + URLEncoder.encode("ctl00$hfAlert") + "=");
+		sb.append("&" + URLEncoder.encode("ctl00$txt_stock_code") + "=");
+		sb.append("&" + URLEncoder.encode("ctl00$txt_stock_name") + "=");
+		sb.append("&" + URLEncoder.encode("ctl00$rdo_SelectDocType") + "=rbAfter2006");
+		sb.append("&" + URLEncoder.encode("ctl00$sel_tier_1") + "=1");
+		sb.append("&" + URLEncoder.encode("ctl00$sel_DocTypePrior2006") + "=-1");
+		sb.append("&" + URLEncoder.encode("ctl00$sel_tier_2_group") + "=7");
+		sb.append("&" + URLEncoder.encode("ctl00$sel_tier_2") + "=60");
+		sb.append("&" + URLEncoder.encode("ctl00$ddlTierTwo") + "=59,1,7");
+		sb.append("&" + URLEncoder.encode("ctl00$ddlTierTwoGroup") + "=26,5");
+		sb.append("&" + URLEncoder.encode("ctl00$txtKeyWord") + "=");
+		sb.append("&" + URLEncoder.encode("ctl00$sel_DateOfReleaseFrom_d") + "=" + pad00(yesterday.getDayOfMonth()));
+		sb.append("&" + URLEncoder.encode("ctl00$sel_DateOfReleaseFrom_m") + "=" + pad00(yesterday.getMonthValue()));
+		sb.append("&" + URLEncoder.encode("ctl00$sel_DateOfReleaseFrom_y") + "=" + yesterday.getYear());
+		sb.append("&" + URLEncoder.encode("ctl00$sel_DateOfReleaseTo_d") + "=" + pad00(today.getDayOfMonth()));
+		sb.append("&" + URLEncoder.encode("ctl00$sel_DateOfReleaseTo_m") + "=" + pad00(today.getMonthValue()));
 		sb.append("&" + URLEncoder.encode("ctl00$sel_DateOfReleaseTo_y") + "=" + today.getYear());
 		sb.append("&" + URLEncoder.encode("ctl00$rdo_SelectDateOfRelease") + "=rbManualRange");
 		sb.append("&" + URLEncoder.encode("ctl00$sel_defaultDateRange") + "=SevenDays");
@@ -91,10 +127,20 @@ public class HkexNewsWeb {
 	private final Pattern namePattern = Pattern.compile("<span id=\"ctl[\\d]+_gvMain_ctl[\\d]+_lbStockName\">(.+?)(?=<)</span>");
 	private final Pattern datePattern = Pattern.compile("<span id=\"ctl[\\d]+_gvMain_ctl[\\d]+_lbDateTime\">([\\d/]+)<br>([\\d:]+)</span>");
 	private final Pattern titleAndUrlPattern = Pattern.compile("<a id=\"ctl[\\d]+_gvMain_ctl[\\d]+_hlTitle\" class=\"news\" href=\"(.+?)(?=\")\" target=\"_blank\">(.+?)(?=<)</a>");
-			
-	public List<News> getNewsList() {
+	
+	public List<News> getAcquiringNewsList() {
 		SessionData session = this.getSession();
-		String postData = this.getTodayPostParams(session);
+		String postData = this.getTodayAcquiringParams(session);
+		return this.getNewsList(session, postData);
+	}
+	
+	public List<News> getPlacingNewsList() {
+		SessionData session = this.getSession();
+		String postData = this.getTodayPlacingParams(session);
+		return this.getNewsList(session, postData);
+	}
+	
+	public List<News> getNewsList(SessionData session, String postData) {
 		String resp = HttpUtil.post(baseUrl, postData, session.cookie);
 		
 //		System.out.println(resp);
@@ -110,6 +156,7 @@ public class HkexNewsWeb {
 		while (mnp.find()) {
 			allName.add(mnp.group(1));
 		}
+		
 		
 		List<Date> allDate = new ArrayList<Date>();
 		Matcher mdp = datePattern.matcher(resp);

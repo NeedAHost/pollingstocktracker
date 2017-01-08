@@ -32,7 +32,16 @@ public class HkexNewsWebTest {
 	@Test
 	public void realTest() {
 		HkexNewsWeb h = new HkexNewsWeb();
-		for (News news : h.getNewsList()) {
+		for (News news : h.getPlacingNewsList()) {
+			System.out.println(news.toString());
+		}
+	}
+	
+	@Ignore
+	@Test
+	public void realTest2() {
+		HkexNewsWeb h = new HkexNewsWeb();
+		for (News news : h.getAcquiringNewsList()) {
 			System.out.println(news.toString());
 		}
 	}
