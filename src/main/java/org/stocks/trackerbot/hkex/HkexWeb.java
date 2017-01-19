@@ -22,8 +22,9 @@ public class HkexWeb {
 	private static final Logger logger = LoggerFactory.getLogger(HkexWeb.class);
 
 	private String baseUrl = "http://www.hkexnews.hk/sdw/search/search_sdw.asp";
-	private final String postTemplate = "txt_today_d=%1$s&txt_today_m=%2$s&txt_today_y=%3$s&current_page=1&stock_market=HKEX&IsExist_Slt_Stock_Id=False&IsExist_Slt_Part_Id=False&rdo_SelectSortBy=Shareholding&sessionToken=%4$s&sel_ShareholdingDate_d=%5$s&sel_ShareholdingDate_m=%6$s&sel_ShareholdingDate_y=%7$s&txt_stock_code=%8$05d&txt_stock_name=&txt_ParticipantID=&txt_Participant_name=";
-
+//	private final String postTemplate = "txt_today_d=%1$s&txt_today_m=%2$s&txt_today_y=%3$s&current_page=1&stock_market=HKEX&IsExist_Slt_Stock_Id=False&IsExist_Slt_Part_Id=False&rdo_SelectSortBy=Shareholding&sessionToken=%4$s&sel_ShareholdingDate_d=%5$s&sel_ShareholdingDate_m=%6$s&sel_ShareholdingDate_y=%7$s&txt_stock_code=%8$05d&txt_stock_name=&txt_ParticipantID=&txt_Participant_name=";
+	private final String postTemplate = "today=%1%s&sortBy=&selPartID=&alertMsg=&ddlShareholdingDay=%2%s&ddlShareholdingMonth=%3%s&ddlShareholdingYear=%4%s&txtStockCode=%5%s&txtStockName=&txtParticipantID=&txtParticipantName=&btnSearch.x=18&btnSearch.y=15";
+	
 	private final Pattern participantPattern = Pattern.compile(
 			"<td valign=\"top\" nowrap=\"nowrap\" class=\"arial12black\" bgcolor=\"#[\\w]+\"><img src=\"../../image/spacer.gif\" width=\"10\" height=\"10\"/>([\\w]+)</td>");
 	private final Pattern percentagePattern = Pattern.compile(
@@ -36,6 +37,7 @@ public class HkexWeb {
 	private static final SimpleDateFormat yearSdf = new SimpleDateFormat("yyyy");
 	private static final SimpleDateFormat monthSdf = new SimpleDateFormat("MM");
 	private static final SimpleDateFormat dateSdf = new SimpleDateFormat("dd");
+	private static final SimpleDateFormat yyyyMMdd = new SimpleDateFormat("yyyyMMdd");
 
 	public List<Shareholding> get(String symbol, Date date) {
 		return this.get(symbol, yearSdf.format(date), monthSdf.format(date), dateSdf.format(date));
@@ -56,15 +58,12 @@ public class HkexWeb {
 			// System.out.println("Cookie " + cookieAndData[0]);
 
 			Calendar today = Calendar.getInstance();
-			String todayDay = Integer.toString(today.get(Calendar.DAY_OF_MONTH));
-			String todayMonth = Integer.toString(today.get(Calendar.MONTH) + 1);
-			String todayYear = Integer.toString(today.get(Calendar.YEAR));
 
 			int symbolInt = Integer.parseInt(symbol);
 
-			String postData = String.format(postTemplate, todayDay, todayMonth, todayYear, sessionToken, date, month,
+			String postData = String.format(postTemplate, yyyyMMdd.format(today.getTime()), sessionToken, date, month,
 					year, symbolInt);
-			// System.out.println("PostData " + postData);
+			 System.out.println("PostData " + postData);
 
 			resp = HttpUtil.post(baseUrl, postData, cookieAndData[0]);
 

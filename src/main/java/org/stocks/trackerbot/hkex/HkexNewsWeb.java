@@ -82,7 +82,7 @@ public class HkexNewsWeb {
 		sb.append("&" + URLEncoder.encode("ctl00$rdo_SelectDateOfRelease") + "=rbManualRange");
 		sb.append("&" + URLEncoder.encode("ctl00$sel_defaultDateRange") + "=SevenDays");
 		sb.append("&" + URLEncoder.encode("ctl00$rdo_SelectSortBy") + "=rbDateTime");
-		System.out.println(sb.toString());
+//		System.out.println(sb.toString());
 		return sb.toString();
 	}
 	
@@ -121,6 +121,37 @@ public class HkexNewsWeb {
 		return sb.toString();
 	}
 	
+	public String getTodayRevenueParams(SessionData session) {
+		StringBuilder sb = new StringBuilder();
+		sb.append(session.toString());		
+		LocalDate today = LocalDate.now();
+		String todayStr = today.format(yyyyMMdd);
+		LocalDate yesterday = today.minusDays(1);
+		sb.append("&" + URLEncoder.encode("ctl00$txt_today") + "=" + todayStr);
+		sb.append("&" + URLEncoder.encode("ctl00$hfStatus") + "=ACM");
+		sb.append("&" + URLEncoder.encode("ctl00$hfAlert") + "=");
+		sb.append("&" + URLEncoder.encode("ctl00$txt_stock_code") + "=");
+		sb.append("&" + URLEncoder.encode("ctl00$txt_stock_name") + "=");
+		sb.append("&" + URLEncoder.encode("ctl00$rdo_SelectDocType") + "=rbAfter2006");
+		sb.append("&" + URLEncoder.encode("ctl00$sel_tier_1") + "=1");
+		sb.append("&" + URLEncoder.encode("ctl00$sel_DocTypePrior2006") + "=-1");
+		sb.append("&" + URLEncoder.encode("ctl00$sel_tier_2_group") + "=3");
+		sb.append("&" + URLEncoder.encode("ctl00$sel_tier_2") + "=31");
+		sb.append("&" + URLEncoder.encode("ctl00$ddlTierTwo") + "=59,1,7");
+		sb.append("&" + URLEncoder.encode("ctl00$ddlTierTwoGroup") + "=26,5");
+		sb.append("&" + URLEncoder.encode("ctl00$txtKeyWord") + "=");
+		sb.append("&" + URLEncoder.encode("ctl00$sel_DateOfReleaseFrom_d") + "=" + pad00(yesterday.getDayOfMonth()));
+		sb.append("&" + URLEncoder.encode("ctl00$sel_DateOfReleaseFrom_m") + "=" + pad00(yesterday.getMonthValue()));
+		sb.append("&" + URLEncoder.encode("ctl00$sel_DateOfReleaseFrom_y") + "=" + yesterday.getYear());
+		sb.append("&" + URLEncoder.encode("ctl00$sel_DateOfReleaseTo_d") + "=" + pad00(today.getDayOfMonth()));
+		sb.append("&" + URLEncoder.encode("ctl00$sel_DateOfReleaseTo_m") + "=" + pad00(today.getMonthValue()));
+		sb.append("&" + URLEncoder.encode("ctl00$sel_DateOfReleaseTo_y") + "=" + today.getYear());
+		sb.append("&" + URLEncoder.encode("ctl00$rdo_SelectDateOfRelease") + "=rbManualRange");
+		sb.append("&" + URLEncoder.encode("ctl00$sel_defaultDateRange") + "=SevenDays");
+		sb.append("&" + URLEncoder.encode("ctl00$rdo_SelectSortBy") + "=rbDateTime");
+		return sb.toString();
+	}
+	
 	private final SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm");
 	
 	private final Pattern stockCodePattern = Pattern.compile("<span id=\"ctl[\\d]+_gvMain_ctl[\\d]+_lbStockCode\">([\\d]+)</span>");
@@ -131,6 +162,12 @@ public class HkexNewsWeb {
 	public List<News> getAcquiringNewsList() {
 		SessionData session = this.getSession();
 		String postData = this.getTodayAcquiringParams(session);
+		return this.getNewsList(session, postData);
+	}
+	
+	public List<News> getRevenueNewsList() {
+		SessionData session = this.getSession();
+		String postData = this.getTodayRevenueParams(session);
 		return this.getNewsList(session, postData);
 	}
 	

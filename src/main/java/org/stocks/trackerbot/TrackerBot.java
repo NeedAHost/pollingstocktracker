@@ -63,6 +63,9 @@ public class TrackerBot {
 	}
 
 	public boolean isOldData(TrackerData data) {
+		if (data == null || data.getId() == null || getLastDataId() == null) {
+			return false;
+		}
 		return Config.skipOldData && getLastDataId().equals(data.getId());
 	}
 
@@ -127,7 +130,7 @@ public class TrackerBot {
 		// find new news
 		List<News> latestNews = new ArrayList<News>();
 		List<News> newsList = newsWeb.getPlacingNewsList();
-		newsList.addAll(newsWeb.getAcquiringNewsList());
+		newsList.addAll(newsWeb.getRevenueNewsList());
 		if (lastNews != null) {
 			for (News n : newsList) {
 				if (lastNews.before(n)) {
