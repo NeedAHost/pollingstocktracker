@@ -85,7 +85,7 @@ public class HkexTest {
 	@Test
 	public void realTest3() {
 		HkexTracker hkex = new HkexTracker();
-		hkex.load("2017-01-01");
+		hkex.load("2017-01-26");
 	}
 
 }

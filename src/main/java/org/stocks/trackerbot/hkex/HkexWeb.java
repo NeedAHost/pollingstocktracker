@@ -3,6 +3,7 @@ package org.stocks.trackerbot.hkex;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.RoundingMode;
+import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -21,23 +22,31 @@ public class HkexWeb {
 
 	private static final Logger logger = LoggerFactory.getLogger(HkexWeb.class);
 
-	private String baseUrl = "http://www.hkexnews.hk/sdw/search/search_sdw.asp";
-//	private final String postTemplate = "txt_today_d=%1$s&txt_today_m=%2$s&txt_today_y=%3$s&current_page=1&stock_market=HKEX&IsExist_Slt_Stock_Id=False&IsExist_Slt_Part_Id=False&rdo_SelectSortBy=Shareholding&sessionToken=%4$s&sel_ShareholdingDate_d=%5$s&sel_ShareholdingDate_m=%6$s&sel_ShareholdingDate_y=%7$s&txt_stock_code=%8$05d&txt_stock_name=&txt_ParticipantID=&txt_Participant_name=";
-	private final String postTemplate = "today=%1%s&sortBy=&selPartID=&alertMsg=&ddlShareholdingDay=%2%s&ddlShareholdingMonth=%3%s&ddlShareholdingYear=%4%s&txtStockCode=%5%s&txtStockName=&txtParticipantID=&txtParticipantName=&btnSearch.x=18&btnSearch.y=15";
-	
+	private static final String baseUrl = "http://www.hkexnews.hk/sdw/search/searchsdw_c.aspx";
+
+	private final Pattern viewStatePattern = Pattern.compile(
+			"<input type=\"hidden\" name=\"__VIEWSTATE\" id=\"__VIEWSTATE\" value=\"([a-zA-Z0-9+/]+={0,2})\" />");
+	private final Pattern viewStateGeneratorPattern = Pattern.compile(
+			"<input type=\"hidden\" name=\"__VIEWSTATEGENERATOR\" id=\"__VIEWSTATEGENERATOR\" value=\"([\\w]+)\" />");
+	private final Pattern eventValidationPattern = Pattern.compile(
+			"<input type=\"hidden\" name=\"__EVENTVALIDATION\" id=\"__EVENTVALIDATION\" value=\"([a-zA-Z0-9+/]+={0,2})\" />");
+
 	private final Pattern participantPattern = Pattern.compile(
-			"<td valign=\"top\" nowrap=\"nowrap\" class=\"arial12black\" bgcolor=\"#[\\w]+\"><img src=\"../../image/spacer.gif\" width=\"10\" height=\"10\"/>([\\w]+)</td>");
-	private final Pattern percentagePattern = Pattern.compile(
-			"<td valign=\"top\" nowrap=\"nowrap\" class=\"arial12black\" align=\"Right\" bgcolor=\"#[\\w]+\">([0-9.%]+)<img src=\"../../image/spacer.gif\" width=\"10\" height=\"10\"/>");
+			"<td valign=\"top\" nowrap=\"nowrap\" class=\"arial12black\">[\\s]*<img src=\"../../image/spacer.gif\" width=\"10\" height=\"10\" />([\\w]+)[\\s]*</td>");
 	private final Pattern holdingPattern = Pattern.compile(
-			"<td valign=\"top\" nowrap=\"nowrap\" class=\"arial12black\" align=\"Right\" bgcolor=\"#[\\w]+\">([0-9,]+)</td>");
-	private final Pattern totalHoldingPattern = Pattern.compile(
-			"<td nowrap=\"nowrap\" class=\"arial12black\"  align=\"Right\"><span class=\"mobilezoom\">15,144,602,396</span>");
+			"<td valign=\"top\" nowrap=\"nowrap\" class=\"arial12black\" style=\"text-align: right;\">[\\s]*([0-9,]+)<img src=\"../../image/spacer.gif\" width=\"10\" height=\"10\" />");
+	private final Pattern percentagePattern = Pattern.compile(
+			"<td valign=\"top\" nowrap=\"nowrap\" class=\"arial12black\" style=\"text-align: right;\">[\\s]*([0-9.%]+)<img src=\"../../image/spacer.gif\" alt=\"space\"[\\s]*width=\"10\" height=\"10\" />");
+	
+//	private final Pattern totalHoldingPattern = Pattern.compile(
+//			"<td nowrap=\"nowrap\" class=\"arial12black\"  align=\"Right\"><span class=\"mobilezoom\">15,144,602,396</span>");
 
 	private static final SimpleDateFormat yearSdf = new SimpleDateFormat("yyyy");
 	private static final SimpleDateFormat monthSdf = new SimpleDateFormat("MM");
 	private static final SimpleDateFormat dateSdf = new SimpleDateFormat("dd");
 	private static final SimpleDateFormat yyyyMMdd = new SimpleDateFormat("yyyyMMdd");
+
+	private static final String referer = "http://www.hkexnews.hk/sdw/search/searchsdw_c.aspx";
 
 	public List<Shareholding> get(String symbol, Date date) {
 		return this.get(symbol, yearSdf.format(date), monthSdf.format(date), dateSdf.format(date));
@@ -53,19 +62,54 @@ public class HkexWeb {
 		String resp = null;
 		try {
 			String[] cookieAndData = HttpUtil.getCookieAndData(baseUrl);
-			String sessionToken = this.extractSessionToken(cookieAndData[1]);
-			// System.out.println("ST " + sessionToken);
-			// System.out.println("Cookie " + cookieAndData[0]);
+//			String sessionToken = this.extractSessionToken(cookieAndData[1]);
+//			System.out.println("ST " + sessionToken);
+//			System.out.println("Cookie " + cookieAndData[0].split(";")[0]);
+//			System.out.println("Data " + cookieAndData[1]);
+
+			Matcher mvs = this.viewStatePattern.matcher(cookieAndData[1]);
+			String viewState = "";
+			if (mvs.find()) {
+				viewState = mvs.group(1);
+			}
+
+			Matcher mvsg = this.viewStateGeneratorPattern.matcher(cookieAndData[1]);
+			String viewStateGenerator = "";
+			if (mvsg.find()) {
+				viewStateGenerator = mvsg.group(1);
+			}
+
+			Matcher ev = this.eventValidationPattern.matcher(cookieAndData[1]);
+			String eventValidation = "";
+			if (ev.find()) {
+				eventValidation = ev.group(1);
+			}
 
 			Calendar today = Calendar.getInstance();
 
 			int symbolInt = Integer.parseInt(symbol);
 
-			String postData = String.format(postTemplate, yyyyMMdd.format(today.getTime()), sessionToken, date, month,
-					year, symbolInt);
-			 System.out.println("PostData " + postData);
+			StringBuilder sb = new StringBuilder();
+			sb.append("__VIEWSTATE" + "=" + URLEncoder.encode(viewState));
+			sb.append("&" + "__VIEWSTATEGENERATOR" + "=" + URLEncoder.encode(viewStateGenerator));
+			sb.append("&" + "__EVENTVALIDATION" + "=" + URLEncoder.encode(eventValidation));
+			sb.append("&" + "today" + "=" + yyyyMMdd.format(today.getTime()));
+			sb.append("&" + "sortBy" + "=");
+			sb.append("&" + "selPartID" + "=");
+			sb.append("&" + "alertMsg" + "=");
+			sb.append("&" + "ddlShareholdingDay" + "=" + date);
+			sb.append("&" + "ddlShareholdingMonth" + "=" + month);
+			sb.append("&" + "ddlShareholdingYear" + "=" + year);
+			sb.append("&" + "txtStockCode" + "=" + pad00000(symbolInt));
+			sb.append("&" + "txtStockName" + "=");
+			sb.append("&" + "txtParticipantID" + "=");
+			sb.append("&" + "txtParticipantName" + "=");
+			sb.append("&" + "btnSearch.x" + "=36");
+			sb.append("&" + "btnSearch.y" + "=13");
+						
+//			System.out.println("PostData " + sb.toString());
 
-			resp = HttpUtil.post(baseUrl, postData, cookieAndData[0]);
+			resp = HttpUtil.post(baseUrl, sb.toString(), cookieAndData[0], referer);
 
 //			System.out.println(resp);
 
@@ -122,6 +166,7 @@ public class HkexWeb {
 	}
 
 	private static final BigDecimal bd100 = new BigDecimal(100);
+
 	private int parsePercent(String p) {
 		p = p.replaceAll("%", "");
 		BigDecimal bd = new BigDecimal(p);
@@ -140,5 +185,9 @@ public class HkexWeb {
 		}
 		return "";
 	}
-
+	
+	private String pad00000(int s) {
+		return String.format("%05d", s);
+	}
+	
 }

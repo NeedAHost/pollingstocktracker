@@ -79,8 +79,12 @@ public class HttpUtil {
 		}
 		return null;
 	}
-
+	
 	public static String post(String url, String data, String cookie) {
+		return post(url, data, cookie, null);
+	}
+
+	public static String post(String url, String data, String cookie, String referer) {
 		try {
 			URL obj = new URL(url);
 			HttpURLConnection con = (HttpURLConnection) obj.openConnection();
@@ -88,6 +92,9 @@ public class HttpUtil {
 			con.setRequestMethod("POST");
 			con.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
 			con.setRequestProperty("Cookie", cookie);
+			if (referer != null) {
+				con.setRequestProperty("Referer", referer);
+			}
 			con.setDoOutput(true);
 			DataOutputStream wr = new DataOutputStream(con.getOutputStream());
 			wr.writeBytes(data);
