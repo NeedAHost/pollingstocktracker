@@ -54,4 +54,13 @@ public class HkexNewsWebTest {
 			System.out.println(news.toString());
 		}
 	}
+	
+	@Ignore
+	@Test
+	public void realTest4() {
+		HkexNewsWeb h = new HkexNewsWeb();
+		for (News news : h.getRightsIssueNewsList()) {
+			System.out.println(news.toString());
+		}
+	}
 }

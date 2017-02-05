@@ -130,7 +130,8 @@ public class TrackerBot {
 		// find new news
 		List<News> latestNews = new ArrayList<News>();
 		List<News> newsList = newsWeb.getPlacingNewsList();
-		newsList.addAll(newsWeb.getRevenueNewsList());
+		newsList.addAll(newsWeb.getAcquiringNewsList());
+		newsList.addAll(newsWeb.getRightsIssueNewsList());
 		if (lastNews != null) {
 			for (News n : newsList) {
 				if (lastNews.before(n)) {
